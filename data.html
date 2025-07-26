@@ -220,7 +220,7 @@
     nameInput.value = nama;
 
     const kirimKeAppsScript = (gambarBase64) => {
-      fetch("https://script.google.com/macros/s/AKfycbwfZy-kk3IUQuj3u482x39Oh02gTjNJHlCKM1N50JRY5Ae5V4xHmTlfldrw6uec_7MIIQ/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbzRrhbDMWnjoTbi2PosAl8eU_-K6sFRhmjQlUVlodF_XAiMS5u1pNiHmazDefMRm4xIjg/exec", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nama, teks, gambar: gambarBase64 || "" })

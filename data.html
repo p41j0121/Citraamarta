@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Paguyuban Citra Amarta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e8f5e9);
+      margin: 0;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      animation: fadeIn 0.6s ease-out;
+      position: relative;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 30px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background-color: #f1f8e9;
+      margin: 10px 0;
+      padding: 15px 20px;
+      border-left: 6px solid #00796b;
+      border-radius: 10px;
+      font-size: 1.1em;
+      color: #333;
+      transition: transform 0.2s ease;
+    }
+    li:hover {
+      transform: translateX(5px);
+      background-color: #e8f5e9;
+    }
+    .back-button {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+      text-decoration: none;
+      background-color: #00796b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .back-button:hover {
+      background-color: #004d40;
+    }
+
+    /* Tombol Login Admin */
+    .login-top {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+    }
+    .login-top button {
+      padding: 8px 16px;
+      font-weight: bold;
+      background-color: #00796b;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+    .login-top button:hover {
+      background-color: #004d40;
+    }
+
+    /* Modal Login */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .login-button, .cancel-button {
+      margin-top: 15px;
+      width: 48%;
+      padding: 10px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .login-button {
+      background-color: #00796b;
+      color: white;
+    }
+    .cancel-button {
+      background-color: #ccc;
+    }
+    .login-button:hover { background-color: #004d40; }
+    .cancel-button:hover { background-color: #aaa; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="login-top">
+      <button onclick="document.getElementById('loginModal').style.display='block'">🔐 Login Admin</button>
+    </div>
+
+    <h1>🏡 PAGUYUBAN CITRA AMARTA</h1>
+    <ul>
+      <li><a href="tagihan.html" style="text-decoration: none; color: inherit;">📋 Informasi Tagihan</a></li>
+      <li>🏘️ Inventori Perumahan</li>
+      <li>🌳 Fasum dan Fasos</li>
+      <li>🚪 Aturan Masuk Citra Amarta</li>
+      <li>👥 Divisi Paguyuban Citra Marta</li>
+    </ul>
+    <a href="index.html" class="back-button">← Kembali ke Beranda</a>
+  </div>
+
+  <!-- Modal Login -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <h3 style="text-align:center; color:#00796b;">Login Admin</h3>
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+      <div style="display:flex; justify-content: space-between;">
+        <button class="login-button" onclick="login()">Login</button>
+        <button class="cancel-button" onclick="document.getElementById('loginModal').style.display='none'">Batal</button>
+      </div>
+      <p id="loginStatus" style="color:red; text-align:center; margin-top:10px;"></p>
+    </div>
+  </div>
+
+  <script>
+    function login() {
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value.trim();
+      const status = document.getElementById('loginStatus');
+
+      if (user === "admin" && pass === "123456") {
+        window.location.href = "admin.html";
+      } else {
+        status.innerText = "❌ Username atau Password salah!";
+      }
+    }
+
+    // Tutup modal kalau diklik di luar
+    window.onclick = function(event) {
+      const modal = document.getElementById('loginModal');
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    };
+  </script>
+  <!-- Floating Chatbox Aspirasi -->
+<div id="floating-chatbox">
+  <button id="openChatBtn">💬 Aspirasi</button>
+  <div id="chatContainer" style="display:none;">
+    <div id="chatHeader" onclick="toggleChat()" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; font-weight: bold; color: #00796b; cursor: pointer;">
+      <span style="font-size: 16px;">Kotak Aspirasi</span>
+      <button onclick="toggleChat(false); event.stopPropagation();" style="background: none; border: none; font-size: 20px; color: #00796b; cursor: pointer;">×</button>
+    </div>
+    <div id="chatBoxContent"></div>
+    <input type="text" id="chatName" placeholder="👤 Nama / Username" />
+    <textarea id="chatText" placeholder="✍️ Tulis aspirasi Anda..."></textarea>
+    <input type="file" id="chatImage" accept="image/*" />
+    <button onclick="kirimAspirasi()">📩 Kirim Aspirasi</button>
+  </div>
+</div>
+
+<style>
+  #floating-chatbox {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 999;
+    font-family: 'Nunito', sans-serif;
+  }
+  #openChatBtn {
+    background: linear-gradient(to right, #00796b, #26a69a);
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+  }
+  #openChatBtn:hover {
+    transform: scale(1.05);
+  }
+  #chatContainer {
+    width: 320px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
+    padding: 15px;
+    margin-top: 10px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  #chatBoxContent {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 10px;
+    background: #f9f9f9;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  #chatBoxContent .message {
+    background: #e0f2f1;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    border-left: 4px solid #00796b;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  #chatBoxContent .message strong {
+    display: block;
+    color: #004d40;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  #chatBoxContent .message img {
+    max-width: 100%;
+    margin-top: 6px;
+    border-radius: 6px;
+  }
+  #chatContainer input,
+  #chatContainer textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: border 0.2s ease;
+  }
+  #chatContainer input:focus,
+  #chatContainer textarea:focus {
+    outline: none;
+    border-color: #26a69a;
+  }
+  #chatContainer textarea {
+    resize: none;
+    height: 60px;
+  }
+  #chatContainer button {
+    width: 100%;
+    padding: 10px;
+    background: #00796b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  #chatContainer button:hover {
+    background: #004d40;
+  }
+</style>
+
+<script>
+  const openChatBtn = document.getElementById('openChatBtn');
+  const chatContainer = document.getElementById('chatContainer');
+  const chatBoxContent = document.getElementById('chatBoxContent');
+
+  function toggleChat(show) {
+    if (typeof show === "boolean") {
+      chatContainer.style.display = show ? "block" : "none";
+    } else {
+      chatContainer.style.display = chatContainer.style.display === "none" ? "block" : "none";
+    }
+  }
+
+  openChatBtn.onclick = () => toggleChat();
+
+  let chatData = [];
+
+  function tampilkanChat(pesan) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = "message";
+
+    const nameTag = document.createElement('strong');
+    nameTag.textContent = pesan.nama;
+    msgDiv.appendChild(nameTag);
+
+    if (pesan.teks) msgDiv.appendChild(document.createTextNode(pesan.teks));
+
+    if (pesan.gambar) {
+      const img = document.createElement('img');
+      img.src = pesan.gambar;
+      msgDiv.appendChild(img);
+    }
+
+    chatBoxContent.appendChild(msgDiv);
+    chatBoxContent.scrollTop = chatBoxContent.scrollHeight;
+  }
+
+  function kirimAspirasi() {
+    const namaInput = document.getElementById('chatName');
+    const teks = document.getElementById('chatText').value.trim();
+    const gambarFile = document.getElementById('chatImage').files[0];
+    const nama = namaInput.value.trim() || "Anonim";
+
+    if (!teks && !gambarFile) return;
+
+    // Simpan nama ke localStorage agar tidak perlu diisi lagi
+    localStorage.setItem("aspirasiNama", nama);
+    namaInput.value = nama;
+
+    const pesan = { nama, teks, gambar: null };
+
+    if (gambarFile) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        pesan.gambar = e.target.result;
+        chatData.push(pesan);
+        simpanChat();
+        tampilkanChat(pesan);
+        resetForm();
+      };
+      reader.readAsDataURL(gambarFile);
+    } else {
+      chatData.push(pesan);
+      simpanChat();
+      tampilkanChat(pesan);
+      resetForm();
+    }
+  }
+
+  function simpanChat() {
+    localStorage.setItem("aspirasiChat", JSON.stringify(chatData));
+  }
+
+  function muatChat() {
+    const data = localStorage.getItem("aspirasiChat");
+    if (data) {
+      chatData = JSON.parse(data);
+      chatData.forEach(tampilkanChat);
+    }
+  }
+
+  function isiNamaOtomatis() {
+    const namaTersimpan = localStorage.getItem("aspirasiNama");
+    if (namaTersimpan) {
+      document.getElementById('chatName').value = namaTersimpan;
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('chatText').value = "";
+    document.getElementById('chatImage').value = "";
+  }
+
+  // Jalankan saat halaman dimuat
+  muatChat();
+  isiNamaOtomatis();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Data Paguyuban Citra Amarta</title>
+  <title>Kotak Aspirasi Warga</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
     body {
@@ -47,7 +47,6 @@
       font-weight: bold;
     }
 
-    /* Chatbox */
     #floating-chatbox {
       position: fixed;
       bottom: 20px;
@@ -164,11 +163,6 @@
 
     openChatBtn.onclick = () => toggleChat();
 
-    window.onload = function () {
-      const savedName = localStorage.getItem("aspirasiNama");
-      if (savedName) nameInput.value = savedName;
-    };
-
     function tampilkanChat(pesan) {
       const msgDiv = document.createElement('div');
       msgDiv.className = "message";
@@ -189,9 +183,7 @@
         fetch("https://sheetdb.io/api/v1/8f0yu7w4xt4p7", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            data: { nama, teks, gambar: gambarBase64 }
-          })
+          body: JSON.stringify({ data: { nama, teks, gambar: gambarBase64 } })
         })
         .then(res => res.json())
         .then(() => {
@@ -210,6 +202,22 @@
         submitToSheetDB();
       }
     }
+
+    // Tampilkan semua chat dari Sheet saat halaman dibuka
+    window.onload = function () {
+      const savedName = localStorage.getItem("aspirasiNama");
+      if (savedName) nameInput.value = savedName;
+
+      fetch("https://sheetdb.io/api/v1/8f0yu7w4xt4p7")
+        .then(res => res.json())
+        .then(data => {
+          data.forEach(row => tampilkanChat({
+            nama: row.nama,
+            teks: row.teks,
+            gambar: row.gambar
+          }));
+        });
+    };
   </script>
 
 </body>

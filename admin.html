@@ -98,9 +98,6 @@
       <label for="sampah">Tagihan Sampah</label>
       <input type="number" id="sampah" required>
 
-      <label for="keamanan">Tagihan Keamanan</label>
-      <input type="number" id="keamanan" required>
-
       <label for="foto">Upload Foto Meteran</label>
       <input type="file" id="foto" accept="image/*" required>
 
@@ -154,9 +151,8 @@
         ipl: "Rp " + document.getElementById("ipl").value,
         sampah: "Rp " + document.getElementById("sampah").value,
         air: "Rp " + document.getElementById("air").value,
-        kemananan: "Rp " + document.getElementById("keamanan").value,
-        foto: fotoURL,
         status: "Belum Lunas",
+        foto: fotoURL,
         t: Date.now()
       });
 

@@ -122,14 +122,14 @@
 
       const fileInput = document.getElementById("foto");
       const file = fileInput.files[0];
-      const formData = new FormData();
-      formData.append("image", file);
+      const formDataImg = new FormData();
+      formDataImg.append("image", file);
 
       let fotoURL = "";
       try {
         const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
           method: "POST",
-          body: formData
+          body: formDataImg
         });
         const jsonImg = await resImg.json();
         fotoURL = jsonImg.data.url;
@@ -140,24 +140,24 @@
         return;
       }
 
-      statusEl.innerText = "⏳ Mengirim data tagihan...";
+      statusEl.innerText = "⏳ Mengirim data ke spreadsheet...";
 
-      const params = new URLSearchParams({
-        action: "insert",
-        rumah: document.getElementById("rumah").value.trim().toUpperCase(),
-        nama: document.getElementById("nama").value.trim(),
-        bulan: document.getElementById("bulan").value.trim(),
-        tahun: document.getElementById("tahun").value.trim(),
-        ipl: "Rp " + document.getElementById("ipl").value,
-        sampah: "Rp " + document.getElementById("sampah").value,
-        air: "Rp " + document.getElementById("air").value,
-        foto: fotoURL,
-        status: "Belum Lunas",
-        t: Date.now()
-      });
+      const formData = new FormData();
+      formData.append("rumah", document.getElementById("rumah").value.trim().toUpperCase());
+      formData.append("nama", document.getElementById("nama").value.trim());
+      formData.append("bulan", document.getElementById("bulan").value.trim());
+      formData.append("tahun", document.getElementById("tahun").value.trim());
+      formData.append("ipl", "Rp " + document.getElementById("ipl").value);
+      formData.append("sampah", "Rp " + document.getElementById("sampah").value);
+      formData.append("air", "Rp " + document.getElementById("air").value);
+      formData.append("status", "Belum Lunas");
+      formData.append("foto", fotoURL);
 
       try {
-        const res = await fetch(`${GAS_URL}?${params.toString()}`, { method: 'GET', cache: 'no-store' });
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          body: formData
+        });
         const json = await res.json();
         if (json.success) {
           statusEl.style.color = 'green';

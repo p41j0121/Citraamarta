@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Input Tagihan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #e8f5e9);
+      padding: 30px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: white;
+      padding: 25px 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 20px;
+    }
+    label {
+      margin-top: 10px;
+      font-weight: bold;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: #00796b;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #004d40; }
+    #status {
+      margin-top: 15px;
+      text-align: center;
+      font-weight: bold;
+    }
+    .logout-btn { background-color: #d32f2f; }
+    .logout-btn:hover { background-color: #b71c1c; }
+    .update-status-btn { background-color: #607d8b; }
+    .update-status-btn:hover { background-color: #455a64; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📥 INPUT TAGIHAN BULANAN</h2>
+    <form id="formTagihan">
+      <label for="rumah">Nomor Rumah</label>
+      <input type="text" id="rumah" required>
+
+      <label for="nama">Nama Warga</label>
+      <input type="text" id="nama" required>
+
+      <label for="bulan">Bulan</label>
+      <select id="bulan" required>
+        <option value="">Pilih Bulan</option>
+        <option>Januari</option><option>Februari</option><option>Maret</option>
+        <option>April</option><option>Mei</option><option>Juni</option>
+        <option>Juli</option><option>Agustus</option><option>September</option>
+        <option>Oktober</option><option>November</option><option>Desember</option>
+      </select>
+
+      <label for="tahun">Tahun</label>
+      <select id="tahun" required>
+        <option value="">Pilih Tahun</option>
+        <option>2025</option><option>2026</option><option>2027</option>
+        <option>2028</option><option>2029</option><option>2030</option>
+        <option>2039</option><option>2040</option><option>2041</option>
+        <option>2042</option><option>2043</option><option>2045</option>
+      </select>
+
+      <label for="ipl">Tagihan IPL</label>
+      <input type="number" id="ipl" required>
+
+      <label for="air">Tagihan Air</label>
+      <input type="number" id="air" required>
+
+      <label for="sampah">Tagihan Sampah</label>
+      <input type="number" id="sampah" required>
+
+      <label for="keamanan">Tagihan Keamanan</label>
+      <input type="number" id="keamanan" required>
+
+      <label for="foto">Upload Foto Meteran</label>
+      <input type="file" id="foto" accept="image/*" required>
+
+      <button type="submit" id="submitBtn">Kirim ke Spreadsheet</button>
+      <button type="button" class="update-status-btn" onclick="window.location.href='update-status.html'">Update Status Bayar</button>
+      <p id="status"></p>
+      <button type="button" class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </form>
+  </div>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxVKGrTWqM6VRm24yMkpKrJS6c4xn3YukfyJsIU23ABUR3px57mMogPEXa0HY_4UPSP1g/exec';
+    const imgbbKey = '40ee2c5d0fe71b0afdb293f91a003b2b';
+
+    document.getElementById("formTagihan").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const statusEl = document.getElementById("status");
+      const btn = document.getElementById("submitBtn");
+      statusEl.style.color = 'black';
+      statusEl.innerText = "⏳ Mengupload foto...";
+      btn.disabled = true;
+
+      const fileInput = document.getElementById("foto");
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append("image", file);
+
+      let fotoURL = "";
+      try {
+        const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
+          method: "POST",
+          body: formData
+        });
+        const jsonImg = await resImg.json();
+        fotoURL = jsonImg.data.url;
+      } catch (err) {
+        statusEl.style.color = 'red';
+        statusEl.innerText = "❌ Gagal upload foto";
+        btn.disabled = false;
+        return;
+      }
+
+      statusEl.innerText = "⏳ Mengirim data tagihan...";
+
+      const params = new URLSearchParams({
+        action: "insert",
+        rumah: document.getElementById("rumah").value.trim().toUpperCase(),
+        nama: document.getElementById("nama").value.trim(),
+        bulan: document.getElementById("bulan").value.trim(),
+        tahun: document.getElementById("tahun").value.trim(),
+        ipl: "Rp " + document.getElementById("ipl").value,
+        sampah: "Rp " + document.getElementById("sampah").value,
+        air: "Rp " + document.getElementById("air").value,
+        kemananan: "Rp " + document.getElementById("keamanan").value,
+        foto: fotoURL,
+        status: "Belum Lunas",
+        t: Date.now()
+      });
+
+      try {
+        const res = await fetch(`${GAS_URL}?${params.toString()}`, { method: 'GET', cache: 'no-store' });
+        const json = await res.json();
+        if (json.success) {
+          statusEl.style.color = 'green';
+          statusEl.innerText = "✅ Data berhasil dikirim!";
+          document.getElementById("formTagihan").reset();
+        } else {
+          throw new Error(json.message || "Gagal menyimpan data");
+        }
+      } catch (err) {
+        statusEl.style.color = 'red';
+        statusEl.innerText = "❌ Gagal: " + err.message;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function logout() {
+      window.location.href = "data.html";
+    }
+  </script>
+</body>
+</html>

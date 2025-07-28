@@ -101,9 +101,8 @@
   </div>
 
   <script>
-    const GAS_URL   = "https://script.google.com/macros/s/AKfycbzHNMdE7HoI6o5Ajq7ZTBKMuVUNG2YGkmF_hVUIcpMWLizTVh6rFP6ib9di6QHNmfKvkw/exec";
-    const WA_NUMBER = "6281258214836"; // Nomor WA admin
-
+    const GAS_URL   = "https://script.google.com/macros/s/AKfycbzefjRQlgLpqvffNvSJQVcaUF9e1-Aads8ChYqHZ1OnAYZMoz2PdibCmwQG7pAhim7z/exec";
+    const WA_NUMBER = "6281258214836";
     let lastTagihan = null;
 
     function cekTagihan() {
@@ -128,6 +127,7 @@
             lastTagihan = null;
             return;
           }
+
           const t = json.data;
           lastTagihan = t;
 
@@ -145,7 +145,9 @@
             <strong>Air:</strong> ${t.air}<br>
             <strong>Sampah:</strong> ${t.sampah}<br>
             <strong>Status:</strong> <span style="color:${statusColor};font-weight:bold">${t.status || '-'}</span><br><br>
-            ${t.foto ? `<img class="foto-meteran" src="${t.foto}" alt="Foto Meteran">` : ''}
+            ${t.foto
+              ? `<img class="foto-meteran" src="${t.foto}" alt="Foto Meteran">`
+              : `<p style="color:gray;font-style:italic;">Belum ada foto meteran yang diunggah.</p>`}
             ${bayarBtn}
           `;
         })

@@ -269,7 +269,7 @@
       const submitToScript = (gambarURL = "") => {
         const data = { nama, aspirasi: teks, gambar: gambarURL };
 
-        fetch("https://script.google.com/macros/s/AKfycbyMy-6EVxVdgwD7Jq6un2Wvmg2ql1X4lU7e-DdUxkU1rWNz9zUd1dUfkXko6cBG-5x1Vg/exec", {
+        fetch("https://script.google.com/macros/s/AKfycbxZ3WgjkmgUUMeqcAc_egFjflKo3LdtFYK0dmvNtaCH6FKbesd5IDT74e1CSQLiwrzMdw/exec", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)

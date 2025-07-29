@@ -270,7 +270,7 @@
         fetch("https://sheetdb.io/api/v1/8f0yu7w4xt4p7", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: { nama, teks, gambar: gambarURL } })
+          body: JSON.stringify({ data: { nama, aspirasi: teks, gambar: gambarURL } })
         })
         .then(res => res.json())
         .then(() => {
@@ -320,10 +320,11 @@
         .then(data => {
           chatBoxContent.innerHTML = "";
           data.forEach(row => tampilkanChat({
-            nama: row.nama,
-            teks: row.teks,
-            gambar: row.gambar
-          }));
+  nama: row.nama,
+  teks: row.aspirasi,
+  gambar: row.gambar
+}));
+
         });
     }
 

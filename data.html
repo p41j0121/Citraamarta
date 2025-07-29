@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -22,6 +21,7 @@
     .login-top { position: absolute; top: 20px; right: 30px; }
     .login-top button { padding: 8px 16px; font-weight: bold; background-color: #00796b; border: none; border-radius: 8px; color: white; cursor: pointer; }
     .login-top button:hover { background-color: #004d40; }
+
     #floating-chatbox { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
     #openChatBtn { background-color: #00796b; color: white; padding: 12px 20px; border: none; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     #chatContainer { width: 300px; background: #fff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); padding: 10px; margin-top: 10px; display: none; }
@@ -55,19 +55,21 @@
     <a href="index.html" class="back-button">← Kembali ke Beranda</a>
   </div>
 
+  <!-- Modal Login -->
   <div id="loginModal" class="modal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
     <div class="modal-content" style="background:white; margin:15% auto; padding:20px; border-radius:12px; max-width:400px; box-shadow:0 8px 24px rgba(0,0,0,0.2);">
       <h3 style="text-align:center; color:#00796b;">Admin Paguyuban</h3>
       <input type="text" id="username" placeholder="Username" style="width:100%; padding:12px; margin-top:10px; border:1px solid #ccc; border-radius:8px;">
       <input type="password" id="password" placeholder="Password" style="width:100%; padding:12px; margin-top:10px; border:1px solid #ccc; border-radius:8px;">
       <div style="display:flex; justify-content: space-between; margin-top: 10px;">
-        <button class="login-button" onclick="login()" style="width:48%; padding:10px; font-weight:bold; background:#00796b; color:white; border:none; border-radius:8px;">Login</button>
-        <button class="cancel-button" onclick="document.getElementById('loginModal').style.display='none'" style="width:48%; padding:10px; font-weight:bold; background:#ccc; border:none; border-radius:8px;">Batal</button>
+        <button onclick="login()" style="width:48%; padding:10px; font-weight:bold; background:#00796b; color:white; border:none; border-radius:8px;">Login</button>
+        <button onclick="document.getElementById('loginModal').style.display='none'" style="width:48%; padding:10px; font-weight:bold; background:#ccc; border:none; border-radius:8px;">Batal</button>
       </div>
       <p id="loginStatus" style="color:red; text-align:center; margin-top:10px;"></p>
     </div>
   </div>
 
+  <!-- Floating Chatbox -->
   <div id="floating-chatbox">
     <button id="openChatBtn">💬 Aspirasi</button>
     <div id="chatContainer">
@@ -84,7 +86,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8_38EzUQPQh_NSABZWhRF9eBeZioEZhsIoGhdum-8TyzH4Z_c72iJQ29_GyprDNHsxQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/YOUR-SCRIPT-ID/exec"; // Ganti dengan URL Apps Script kamu
 
     function toggleSubmenu() {
       document.getElementById("submenuKeuangan").classList.toggle("show");
@@ -107,9 +109,7 @@
     const nameInput = document.getElementById('chatName');
 
     function toggleChat(show) {
-      chatContainer.style.display = (typeof show === "boolean")
-        ? (show ? "block" : "none")
-        : (chatContainer.style.display === "none" ? "block" : "none");
+      chatContainer.style.display = (typeof show === "boolean") ? (show ? "block" : "none") : (chatContainer.style.display === "none" ? "block" : "none");
     }
 
     openChatBtn.onclick = () => toggleChat();

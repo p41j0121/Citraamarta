@@ -266,21 +266,23 @@
       if (!teks && !gambarFile) return;
       localStorage.setItem("aspirasiNama", nama);
 
-      const submitToSheetDB = (gambarURL = "") => {
-        fetch("https://sheetdb.io/api/v1/8f0yu7w4xt4p7", {
+      const submitToScript = (gambarURL = "") => {
+        const data = { nama, aspirasi: teks, gambar: gambarURL };
+
+        fetch("https://script.google.com/macros/s/AKfycbyMy-6EVxVdgwD7Jq6un2Wvmg2ql1X4lU7e-DdUxkU1rWNz9zUd1dUfkXko6cBG-5x1Vg/exec", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ data: { nama, aspirasi: teks, gambar: gambarURL } })
+          body: JSON.stringify(data)
         })
-        .then(res => res.json())
+        .then(res => res.text())
         .then(() => {
           fetchChatData();
           document.getElementById('chatText').value = "";
           document.getElementById('chatImage').value = "";
         })
         .catch(err => {
-          console.error("❌ Gagal kirim ke SheetDB:", err);
-          alert("Gagal kirim aspirasi. Cek console (F12).");
+          console.error("❌ Gagal kirim:", err);
+          alert("Gagal kirim aspirasi.");
         });
       };
 
@@ -300,7 +302,7 @@
         .then(res => res.json())
         .then(data => {
           if (data && data.data && data.data.url) {
-            submitToSheetDB(data.data.url);
+            submitToScript(data.data.url);
           } else {
             throw new Error("Gagal upload ke ImgBB");
           }
@@ -310,21 +312,20 @@
           alert("Gagal upload gambar.");
         });
       } else {
-        submitToSheetDB();
+        submitToScript();
       }
     }
 
     function fetchChatData() {
-      fetch("https://sheetdb.io/api/v1/8f0yu7w4xt4p7")
+      fetch("https://opensheet.elk.sh/1hSVZkfe5jRGyiI1Ww4SeisIpuhFmRNTGzAz0x8fg-dk/Sheet1")
         .then(res => res.json())
         .then(data => {
           chatBoxContent.innerHTML = "";
           data.forEach(row => tampilkanChat({
-  nama: row.nama,
-  teks: row.aspirasi,
-  gambar: row.gambar
-}));
-
+            nama: row.nama,
+            teks: row.aspirasi,
+            gambar: row.gambar
+          }));
         });
     }
 

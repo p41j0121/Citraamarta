@@ -6,35 +6,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* (CSS tetap, tidak berubah dari versi sebelumnya) */
     body {
       font-family: 'Nunito', sans-serif;
       background: linear-gradient(to right, #e0f7fa, #e8f5e9);
       margin: 0;
       padding: 40px 20px;
     }
-    .container { max-width: 600px; margin: auto; background-color: white; padding: 30px; border-radius: 20px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15); position: relative; }
-    h1 { text-align: center; color: #00796b; margin-bottom: 30px; }
-    ul { list-style: none; padding: 0; margin: 0; }
-    li { background-color: #f1f8e9; margin: 10px 0; padding: 15px 20px; border-left: 6px solid #00796b; border-radius: 10px; font-size: 1.1em; color: #333; cursor: pointer; }
-    li:hover { background-color: #e8f5e9; transform: translateX(5px); }
-    li a { color: inherit; text-decoration: none; display: block; }
-    .submenu { overflow: hidden; max-height: 0; transition: max-height 0.4s ease; padding-left: 20px; }
-    .submenu.show { max-height: 200px; }
-    .submenu li { background-color: #e8f5e9; font-size: 1em; padding: 10px 15px; margin-top: 5px; }
-    .back-button, .login-top button, #openChatBtn, #chatContainer button { border-radius: 8px; font-weight: bold; border: none; }
-    .back-button { display: block; text-align: center; margin-top: 30px; background-color: #00796b; color: white; padding: 12px 20px; }
-    .back-button:hover { background-color: #004d40; }
-    .login-top { position: absolute; top: 20px; right: 30px; }
-    .login-top button, #openChatBtn, #chatContainer button { background-color: #00796b; color: white; padding: 8px 16px; cursor: pointer; }
-    .login-top button:hover, #openChatBtn:hover, #chatContainer button:hover { background-color: #004d40; }
-    #floating-chatbox { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
-    #chatContainer { width: 300px; background: #fff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); padding: 10px; margin-top: 10px; display: none; }
-    #chatBoxContent { height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 8px; border-radius: 10px; margin-bottom: 10px; font-size: 14px; }
-    #chatBoxContent .message { background: #e0f2f1; padding: 6px 8px; border-radius: 6px; margin-bottom: 10px; }
-    #chatBoxContent .message strong { color: #004d40; display: block; }
-    #chatBoxContent .message img { max-width: 100%; border-radius: 4px; margin-top: 5px; }
-    #chatContainer input, #chatContainer textarea { width: 100%; padding: 6px; margin-bottom: 6px; font-size: 13px; border-radius: 6px; border: 1px solid #ccc; }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 30px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      background-color: #f1f8e9;
+      margin: 10px 0;
+      padding: 15px 20px;
+      border-left: 6px solid #00796b;
+      border-radius: 10px;
+      font-size: 1.1em;
+      color: #333;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    li:hover {
+      background-color: #e8f5e9;
+      transform: translateX(5px);
+    }
+    li a {
+      color: inherit;
+      text-decoration: none;
+      display: block;
+    }
+    .submenu {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.4s ease;
+      padding-left: 20px;
+    }
+    .submenu li {
+      background-color: #e8f5e9;
+      font-size: 1em;
+      padding: 10px 15px;
+      margin-top: 5px;
+    }
+    .submenu.show {
+      max-height: 200px;
+    }
+    .back-button {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+      text-decoration: none;
+      background-color: #00796b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+    .back-button:hover {
+      background-color: #004d40;
+    }
+    .login-top {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+    }
+    .login-top button {
+      padding: 8px 16px;
+      font-weight: bold;
+      background-color: #00796b;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+    }
+    .login-top button:hover {
+      background-color: #004d40;
+    }
+    #floating-chatbox {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+    }
+    #openChatBtn {
+      background-color: #00796b;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #chatContainer {
+      width: 300px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      padding: 10px;
+      margin-top: 10px;
+      display: none;
+    }
+    #chatBoxContent {
+      height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 8px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+    #chatBoxContent .message {
+      background: #e0f2f1;
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    #chatBoxContent .message strong {
+      color: #004d40;
+      display: block;
+    }
+    #chatBoxContent .message img {
+      max-width: 100%;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+    #chatContainer input, #chatContainer textarea {
+      width: 100%;
+      padding: 6px;
+      margin-bottom: 6px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #chatContainer button {
+      width: 100%;
+      padding: 8px;
+      background: #00796b;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #chatContainer button:hover {
+      background: #004d40;
+    }
   </style>
 </head>
 <body>
@@ -62,11 +194,11 @@
   <div id="loginModal" class="modal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
     <div class="modal-content" style="background:white; margin:15% auto; padding:20px; border-radius:12px; max-width:400px; box-shadow:0 8px 24px rgba(0,0,0,0.2);">
       <h3 style="text-align:center; color:#00796b;">Admin Paguyuban</h3>
-      <input type="text" id="username" placeholder="Username">
-      <input type="password" id="password" placeholder="Password">
+      <input type="text" id="username" placeholder="Username" style="width:100%; padding:12px; margin-top:10px; border:1px solid #ccc; border-radius:8px;">
+      <input type="password" id="password" placeholder="Password" style="width:100%; padding:12px; margin-top:10px; border:1px solid #ccc; border-radius:8px;">
       <div style="display:flex; justify-content: space-between;">
-        <button onclick="login()">Login</button>
-        <button onclick="document.getElementById('loginModal').style.display='none'">Batal</button>
+        <button class="login-button" onclick="login()" style="width:48%; padding:10px; font-weight:bold; background:#00796b; color:white; border:none; border-radius:8px;">Login</button>
+        <button class="cancel-button" onclick="document.getElementById('loginModal').style.display='none'" style="width:48%; padding:10px; font-weight:bold; background:#ccc; border:none; border-radius:8px;">Batal</button>
       </div>
       <p id="loginStatus" style="color:red; text-align:center; margin-top:10px;"></p>
     </div>
@@ -76,9 +208,9 @@
   <div id="floating-chatbox">
     <button id="openChatBtn">💬 Aspirasi</button>
     <div id="chatContainer">
-      <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; color: #00796b;">
+      <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; margin-bottom: 10px; color: #00796b;">
         <span>Kotak Aspirasi</span>
-        <button onclick="toggleChat(false)" style="background:none; border:none;">x</button>
+        <button onclick="toggleChat(false)" style="background: none; border: none; font-size: 16px; color: #00796b; cursor: pointer;">x</button>
       </div>
       <div id="chatBoxContent"></div>
       <input type="text" id="chatName" placeholder="Nama / Username (boleh anonim)">
@@ -104,35 +236,41 @@
       }
     }
 
+    const openChatBtn = document.getElementById('openChatBtn');
+    const chatContainer = document.getElementById('chatContainer');
+    const chatBoxContent = document.getElementById('chatBoxContent');
+    const nameInput = document.getElementById('chatName');
+
     function toggleChat(show) {
-      const chatContainer = document.getElementById('chatContainer');
-      chatContainer.style.display = (typeof show === "boolean") ? (show ? "block" : "none") : (chatContainer.style.display === "none" ? "block" : "none");
+      chatContainer.style.display = (typeof show === "boolean")
+        ? (show ? "block" : "none")
+        : (chatContainer.style.display === "none" ? "block" : "none");
     }
 
-    const nameInput = document.getElementById('chatName');
+    openChatBtn.onclick = () => toggleChat();
 
     function tampilkanChat(pesan) {
       const msgDiv = document.createElement('div');
       msgDiv.className = "message";
-      msgDiv.innerHTML = `<strong>${pesan.nama}</strong>${pesan.teks}${pesan.gambar ? `<br><img src="${pesan.gambar}" />` : ""}`;
-      document.getElementById('chatBoxContent').appendChild(msgDiv);
+      msgDiv.innerHTML = `<strong>${pesan.nama}</strong>${pesan.teks}${pesan.gambar && pesan.gambar !== "-" ? `<br><img src="${pesan.gambar}" />` : ""}`;
+      chatBoxContent.appendChild(msgDiv);
+      chatBoxContent.scrollTop = chatBoxContent.scrollHeight;
     }
 
     function kirimAspirasi() {
       const nama = nameInput.value.trim() || "Anonim";
       const teks = document.getElementById('chatText').value.trim();
       const gambarFile = document.getElementById('chatImage').files[0];
+
       if (!teks && !gambarFile) return;
       localStorage.setItem("aspirasiNama", nama);
 
-      const submitToScript = (gambarURL = "") => {
-        const formData = new FormData();
-        formData.append("nama", nama);
-        formData.append("aspirasi", teks);
-        formData.append("gambar", gambarURL);
-        fetch("https://script.google.com/macros/s/AKfycbx8_38EzUQPQh_NSABZWhRF9eBeZioEZhsIoGhdum-8TyzH4Z_c72iJQ29_GyprDNHsxQ/exec", {
+      const submitToScript = (gambarURL = "-") => {
+        const data = { nama, aspirasi: teks, gambar: gambarURL };
+        fetch("https://script.google.com/macros/s/AKfycbwoiLQIs2x7URIhUj8kvWFzhSHUHW0FQwVvFSeYkLy01EC7pcCm6VDrjQ5C5ML0DlkPOw/exec", {
           method: "POST",
-          body: formData
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
         })
         .then(res => res.text())
         .then(() => {
@@ -140,37 +278,29 @@
           document.getElementById('chatText').value = "";
           document.getElementById('chatImage').value = "";
         })
-        .catch(err => {
-          alert("Gagal kirim aspirasi.");
-        });
+        .catch(() => alert("❌ Gagal kirim aspirasi"));
       };
 
       if (gambarFile) {
         if (gambarFile.size > 1500000) return alert("Ukuran gambar maksimal 1.5 MB");
-        const formDataImg = new FormData();
-        formDataImg.append("image", gambarFile);
+        const formData = new FormData();
+        formData.append("image", gambarFile);
         fetch("https://api.imgbb.com/1/upload?key=40ee2c5d0fe71b0afdb293f91a003b2b", {
           method: "POST",
-          body: formDataImg
+          body: formData
         })
         .then(res => res.json())
-        .then(data => {
-          if (data && data.data && data.data.url) {
-            submitToScript(data.data.url);
-          } else throw new Error();
-        })
-        .catch(() => alert("Gagal upload gambar."));
+        .then(data => submitToScript(data?.data?.url || "-"))
+        .catch(() => alert("❌ Gagal upload gambar."));
       } else {
         submitToScript();
       }
     }
 
     function fetchChatData() {
-      fetch("fetch("https://opensheet.elk.sh/1GemN_MInNAhVsiM1_LIpl3355MChEz-o-P6NUkWqXgQ/KotakAspirasi")
-")
+      fetch("https://opensheet.elk.sh/1GemN_MInNAhVsiM1_LIpl3355MChEz-o-P6NUkWqXgQ/KotakAspirasi")
         .then(res => res.json())
         .then(data => {
-          const chatBoxContent = document.getElementById('chatBoxContent');
           chatBoxContent.innerHTML = "";
           data.forEach(row => tampilkanChat({
             nama: row.nama,
@@ -187,11 +317,9 @@
       setInterval(fetchChatData, 10000);
     };
 
-    document.getElementById('openChatBtn').onclick = () => toggleChat();
-
-    window.onclick = function(e) {
+    window.onclick = function(event) {
       const modal = document.getElementById('loginModal');
-      if (e.target === modal) modal.style.display = "none";
+      if (event.target === modal) modal.style.display = "none";
     };
   </script>
 </body>

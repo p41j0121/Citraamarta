@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Aturan Masuk Citra Amarta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 30px;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .item {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+    .item:hover {
+      transform: translateY(-5px);
+    }
+    .item img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .caption {
+      padding: 15px;
+      text-align: center;
+      font-size: 1em;
+      color: #333;
+    }
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 30px;
+      text-decoration: none;
+      background-color: #00796b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      max-width: 200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .back:hover {
+      background-color: #004d40;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚪 Aturan Masuk Citra Amarta</h1>
+
+  <div class="gallery">
+    <div class="item">
+      <img src="https://via.placeholder.com/400x200?text=Speed+Limit+20KM%2FJ" alt="Speed Limit">
+      <div class="caption">Speed Limit 20 KM/J - Demi keselamatan bersama</div>
+    </div>
+    <div class="item">
+      <img src="https://via.placeholder.com/400x200?text=Tamu+Wajib+Lapor" alt="Tamu Wajib Lapor">
+      <div class="caption">Tamu Wajib Lapor - Untuk keamanan lingkungan</div>
+    </div>
+    <div class="item">
+      <img src="https://via.placeholder.com/400x200?text=Kurir+Paket" alt="Kurir Paket">
+      <div class="caption">Kurir Paket - Harap lapor kepada satpam</div>
+    </div>
+    <div class="item">
+      <img src="https://via.placeholder.com/400x200?text=Lapor+Securiti" alt="Lapor Satpam">
+      <div class="caption">Lapor Security - Semua pengunjung wajib melapor</div>
+    </div>
+  </div>
+
+  <a href="data.html" class="back">← Kembali</a>
+
+</body>
+</html>

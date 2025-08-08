@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <title>Input Pengeluaran</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Proteksi Login -->
+  <script>
+    if (localStorage.getItem("isAdminLoggedIn") !== "true") {
+      alert("❌ Akses ditolak!\n\nHalaman ini khusus admin.\nSilakan login terlebih dahulu.");
+      window.location.href = "data.html"; // ganti sesuai halaman login lu
+    }
+  </script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -115,9 +124,7 @@
       const reader = new FileReader();
       reader.onloadend = async function () {
         const base64String = reader.result.split(',')[1]; // hapus prefix data:image/...
-
         payload.foto = base64String;
-
         await submitToScript(payload);
       };
       reader.readAsDataURL(imageFile);
@@ -138,7 +145,7 @@
 
       const json = await res.json();
       if (json.success) {
-        successMsg.textContent = "Data berhasil disimpan!";
+        successMsg.textContent = "✅ Data berhasil disimpan!";
         form.reset();
       } else {
         alert("Gagal menyimpan data: " + json.message);

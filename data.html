@@ -26,10 +26,7 @@
       color: #00796b;
       margin-bottom: 30px;
     }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
+    ul { list-style: none; padding: 0; }
     li {
       background-color: #f1f8e9;
       margin: 10px 0;
@@ -56,9 +53,7 @@
       padding: 10px 15px;
       margin-top: 5px;
     }
-    .submenu.show {
-      max-height: 200px;
-    }
+    .submenu.show { max-height: 200px; }
     .login-top {
       position: absolute;
       top: 20px;
@@ -73,9 +68,7 @@
       color: white;
       cursor: pointer;
     }
-    .login-top button:hover {
-      background-color: #004d40;
-    }
+    .login-top button:hover { background-color: #004d40; }
     #loginModal {
       display: none;
       position: fixed;
@@ -109,18 +102,9 @@
       border: none;
       position: relative;
     }
-    .login-button {
-      background-color: #00796b;
-      color: white;
-    }
-    .cancel-button {
-      background-color: #ccc;
-    }
-    .modal-content p {
-      text-align: center;
-      margin-top: 10px;
-    }
-    /* Spinner di tombol */
+    .login-button { background-color: #00796b; color: white; }
+    .cancel-button { background-color: #ccc; }
+    .modal-content p { text-align: center; margin-top: 10px; }
     .spinner {
       border: 2px solid rgba(255,255,255,0.3);
       border-top: 2px solid white;
@@ -132,10 +116,7 @@
       vertical-align: middle;
       margin-right: 6px;
     }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -172,6 +153,50 @@
     </div>
   </div>
 
+  <!-- Floating Chat Aspirasi Warga -->
+  <style>
+    #chat-toggle {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #5563DE; color: white;
+      border: none; border-radius: 50%;
+      width: 43px; height: 43px;
+      font-size: 24px; cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      z-index: 9999;
+    }
+    #chat-box {
+      position: fixed; bottom: 90px; right: 20px;
+      width: 280px; max-height: 300px;
+      background: white; border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      display: none; flex-direction: column;
+      overflow: hidden; z-index: 9999;
+    }
+    #chat-header { background: #5563DE; color: white; padding: 10px; font-weight: bold; text-align: center; }
+    #messages { flex: 1; padding: 10px; overflow-y: auto; background: #f9f9f9; }
+    .msg { margin-bottom: 8px; }
+    .username { font-weight: bold; color: #5563DE; }
+    .bubble { background: #e3e7ff; padding: 6px 10px; border-radius: 8px; display: inline-block; max-width: 80%; word-wrap: break-word; }
+    .time { font-size: 0.75em; color: gray; margin-top: 2px; display: block; }
+    .input-area { display: flex; padding: 8px; background: white; border-top: 1px solid #ddd; gap: 5px; }
+    .input-area input { padding: 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    #username { width: 80px; }
+    #messageInput { flex: 1; }
+    #sendBtn { padding: 6px 10px; background: #5563DE; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+  </style>
+
+  <button id="chat-toggle">💬</button>
+  <div id="chat-box">
+    <div id="chat-header">Aspirasi Warga</div>
+    <div id="messages"></div>
+    <div class="input-area">
+      <input type="text" id="username" placeholder="Nama" />
+      <input type="text" id="messageInput" placeholder="Ketik pesan..." />
+      <button id="sendBtn">➤</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbznYSCom57dZZYtshdg3Cs5aecy4J2a9GetW6BnyfDHS4qBRfpWp6jZLc6ancTowPSpyA/exec";
 
@@ -191,41 +216,87 @@
         status.innerText = "❌ Username dan Password wajib diisi!";
         return;
       }
-
-      // Tambah spinner
       loginBtn.innerHTML = '<span class="spinner"></span>Loading...';
       loginBtn.disabled = true;
-      status.style.color = "black";
       status.innerText = "";
 
-      fetch(GAS_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "login", username: user, password: pass })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          localStorage.setItem("isAdminLoggedIn", "true");
-          window.location.href = "admin.html";
-        } else {
+      fetch(GAS_URL, { method: "POST", body: JSON.stringify({ action: "login", username: user, password: pass }) })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            localStorage.setItem("isAdminLoggedIn", "true");
+            window.location.href = "admin.html";
+          } else {
+            status.style.color = "red";
+            status.innerText = "❌ " + data.message;
+          }
+        })
+        .catch(() => {
           status.style.color = "red";
-          status.innerText = "❌ " + data.message;
-        }
-      })
-      .catch(err => {
-        status.style.color = "red";
-        status.innerText = "❌ Terjadi kesalahan koneksi!";
-      })
-      .finally(() => {
-        loginBtn.innerHTML = 'Login';
-        loginBtn.disabled = false;
-      });
+          status.innerText = "❌ Terjadi kesalahan koneksi!";
+        })
+        .finally(() => {
+          loginBtn.innerHTML = 'Login';
+          loginBtn.disabled = false;
+        });
     }
 
     window.onclick = function(event) {
       const modal = document.getElementById('loginModal');
       if (event.target === modal) modal.style.display = "none";
     }
+
+    // Floating Chat Script
+    const SUPABASE_URL = "https://iepiudxiyhcaaqmjrxvm.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllcGl1ZHhpeWhjYWFxbWpyeHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ2MzQxNzYsImV4cCI6MjA3MDIxMDE3Nn0.a9HaHtBp1E0H8nOsn1qkyXBJu2dBLeqElWd4g2klxVM";
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const messagesDiv = document.getElementById("messages");
+    const usernameInput = document.getElementById("username");
+    const messageInput = document.getElementById("messageInput");
+
+    document.getElementById("chat-toggle").onclick = () => {
+      const box = document.getElementById("chat-box");
+      box.style.display = box.style.display === "flex" ? "none" : "flex";
+    };
+
+    async function loadMessages() {
+      const { data, error } = await supabaseClient.from('messages').select('*').order('created_at', { ascending: true });
+      if (!error) {
+        messagesDiv.innerHTML = "";
+        data.forEach(msg => addMessageToUI(msg));
+      }
+    }
+
+    function addMessageToUI(msg) {
+      const div = document.createElement("div");
+      div.classList.add("msg");
+      div.innerHTML = `<span class="username">${msg.username}</span>
+        <div class="bubble">${msg.content}</div>
+        <span class="time">${new Date(msg.created_at).toLocaleTimeString()}</span>`;
+      messagesDiv.appendChild(div);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    async function sendMessage() {
+      let username = usernameInput.value.trim();
+      const content = messageInput.value.trim();
+      if (!username) {
+        username = "Guest" + Math.floor(Math.random() * 1000);
+        usernameInput.value = username;
+      }
+      if (!content) return;
+      await supabaseClient.from('messages').insert([{ username, content }]);
+      messageInput.value = "";
+    }
+
+    document.getElementById("sendBtn").onclick = sendMessage;
+
+    supabaseClient.channel('realtime-messages')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => addMessageToUI(payload.new))
+      .subscribe();
+
+    loadMessages();
   </script>
 </body>
 </html>

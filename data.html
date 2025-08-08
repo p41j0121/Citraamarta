@@ -157,6 +157,8 @@
   </div>
 
   <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbznYSCom57dZZYtshdg3Cs5aecy4J2a9GetW6BnyfDHS4qBRfpWp6jZLc6ancTowPSpyA/exec";
+
     function toggleSubmenu() {
       const submenu = document.getElementById("submenuKeuangan");
       submenu.classList.toggle("show");
@@ -167,12 +169,27 @@
       const pass = document.getElementById('password').value.trim();
       const status = document.getElementById('loginStatus');
 
-      if (user === "admin" && pass === "123456") {
-        localStorage.setItem("isAdminLoggedIn", "true");
-        window.location.href = "admin.html";
-      } else {
-        status.innerText = "❌ Username atau Password salah!";
+      if (!user || !pass) {
+        status.innerText = "❌ Username dan Password wajib diisi!";
+        return;
       }
+
+      fetch(GAS_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "login", username: user, password: pass })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          localStorage.setItem("isAdminLoggedIn", "true");
+          window.location.href = "admin.html";
+        } else {
+          status.innerText = "❌ " + data.message;
+        }
+      })
+      .catch(err => {
+        status.innerText = "❌ Terjadi kesalahan koneksi!";
+      });
     }
 
     window.onclick = function(event) {

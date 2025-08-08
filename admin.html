@@ -48,17 +48,13 @@
     .btn-status { background-color: #607d8b; }
     .btn-status:hover { background-color: #455a64; }
 
-    .btn-register {
-      background-color: #1976d2;
-      width: 100%;
-      margin-top: 10px;
-    }
+    .btn-register { background-color: #1976d2; width: 100%; margin-bottom: 10px; }
     .btn-register:hover { background-color: #0d47a1; }
 
     .btn-logout {
       background-color: #d32f2f;
       width: 100%;
-      margin-top: 20px;
+      margin-top: 10px;
     }
     .btn-logout:hover { background-color: #b71c1c; }
 
@@ -73,11 +69,12 @@
     }
     .modal-content {
       background: white;
-      margin: 15% auto;
+      margin: 10% auto;
       padding: 20px;
       border-radius: 12px;
       max-width: 400px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      position: relative;
     }
     .modal-content input {
       width: 100%;
@@ -87,25 +84,29 @@
       border-radius: 8px;
     }
     .modal-content button {
-      width: 48%;
       padding: 10px;
       font-weight: bold;
       border-radius: 8px;
       border: none;
+      cursor: pointer;
     }
-    .register-button { background-color: #1976d2; color: white; }
-    .cancel-button { background-color: #ccc; }
-    .modal-content p {
-      margin-top: 10px;
-      text-align: center;
+    .register-button { background-color: #00796b; color: white; width: 48%; }
+    .cancel-button { background-color: #ccc; width: 48%; }
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #888;
     }
+    .close-btn:hover { color: black; }
   </style>
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbznYSCom57dZZYtshdg3Cs5aecy4J2a9GetW6BnyfDHS4qBRfpWp6jZLc6ancTowPSpyA/exec";
 
     // Proteksi akses halaman admin
     if (localStorage.getItem("isAdminLoggedIn") !== "true") {
-      alert("❌ Akses ditolak. Hayoo Mau ngapain? Jangan aneh-aneh deh :D");
+      alert("❌ Akses ditolak. Silakan login terlebih dahulu.");
       window.location.href = "data.html";
     }
 
@@ -115,27 +116,34 @@
     }
 
     function registerUser() {
-      const username = document.getElementById("regUsername").value.trim();
-      const password = document.getElementById("regPassword").value.trim();
-      const status = document.getElementById("registerStatus");
+      const user = document.getElementById('regUsername').value.trim();
+      const pass = document.getElementById('regPassword').value.trim();
+      const status = document.getElementById('registerStatus');
+      const btn = document.getElementById('registerBtn');
 
-      if (!username || !password) {
+      if (!user || !pass) {
         status.style.color = "red";
-        status.innerText = "❌ Username dan password wajib diisi!";
+        status.innerText = "❌ Username dan Password wajib diisi!";
         return;
       }
 
+      // Loading effect
+      btn.disabled = true;
+      btn.innerHTML = "⏳ Loading...";
+      status.style.color = "black";
+      status.innerText = "⏳ Sedang memproses...";
+
       fetch(GAS_URL, {
         method: "POST",
-        body: JSON.stringify({ action: "register", username, password })
+        body: JSON.stringify({ action: "register", username: user, password: pass })
       })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           status.style.color = "green";
-          status.innerText = "✅ Akun berhasil dibuat!";
-          document.getElementById("regUsername").value = "";
-          document.getElementById("regPassword").value = "";
+          status.innerText = "✅ Akun berhasil didaftarkan!";
+          document.getElementById('regUsername').value = "";
+          document.getElementById('regPassword').value = "";
         } else {
           status.style.color = "red";
           status.innerText = "❌ " + data.message;
@@ -143,7 +151,11 @@
       })
       .catch(err => {
         status.style.color = "red";
-        status.innerText = "❌ Terjadi kesalahan koneksi";
+        status.innerText = "❌ Terjadi kesalahan koneksi!";
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = "Daftarkan";
       });
     }
   </script>
@@ -162,14 +174,13 @@
 
   <!-- Modal Register -->
   <div id="registerModal">
-    <div class="modal-content" style="position: relative;">
-      <span onclick="document.getElementById('registerModal').style.display='none'" 
-            style="position:absolute;top:10px;right:15px;font-size:20px;cursor:pointer;color:#888;">&times;</span>
+    <div class="modal-content">
+      <span class="close-btn" onclick="document.getElementById('registerModal').style.display='none'">&times;</span>
       <h3 style="text-align:center; color:#00796b;">Register Akun Baru</h3>
       <input type="text" id="regUsername" placeholder="Username baru">
       <input type="password" id="regPassword" placeholder="Password baru">
       <div style="display:flex; justify-content: space-between; margin-top:10px;">
-        <button class="register-button" onclick="registerUser()">Register</button>
+        <button id="registerBtn" class="register-button" onclick="registerUser()">Daftarkan</button>
         <button class="cancel-button" onclick="document.getElementById('registerModal').style.display='none'">Batal</button>
       </div>
       <p id="registerStatus"></p>

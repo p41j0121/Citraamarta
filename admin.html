@@ -55,6 +55,13 @@
     }
     .btn-logout:hover { background-color: #b71c1c; }
   </style>
+  <script>
+    // Proteksi akses halaman admin
+    if (localStorage.getItem("isAdminLoggedIn") !== "true") {
+      alert("❌ Akses ditolak.Hayoo Mau ngapain?Jangan Aneh-Aneh deh :D");
+      window.location.href = "data.html";
+    }
+  </script>
 </head>
 <body>
   <div class="container">
@@ -62,12 +69,14 @@
     <div class="menu-buttons">
       <button class="btn-input" onclick="window.location.href='input.html'">INPUT TAGIHAN</button>
       <button class="btn-status" onclick="window.location.href='update-status.html'">UPDATE STATUS BAYAR</button>
+      <button class="btn-input" onclick="window.location.href='input_pengeluaran.html'">INPUT PENGELUARAN</button>
     </div>
     <button class="btn-logout" onclick="logout()">🚪 LOGOUT</button>
   </div>
 
   <script>
     function logout() {
+      localStorage.removeItem("isAdminLoggedIn");
       window.location.href = "data.html";
     }
   </script>

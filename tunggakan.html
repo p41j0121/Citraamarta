@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Daftar Tunggakan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #fff4f4;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff0f0;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(255, 0, 0, 0.2);
+      border: 2px solid #ffcccc;
+    }
+    h2 {
+      text-align: center;
+      color: #c62828;
+      margin-bottom: 20px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #c62828;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #8e0000;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #e57373;
+    }
+    th {
+      background-color: #ffcdd2;
+      color: #b71c1c;
+    }
+    img {
+      max-width: 100px;
+      border-radius: 6px;
+    }
+    .total-warning {
+      margin-top: 15px;
+      font-weight: bold;
+      color: #b71c1c;
+      background: #ffebee;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .note {
+      background: #fff5f5;
+      border-left: 5px solid #d32f2f;
+      padding: 10px;
+      margin-top: 10px;
+      color: #b71c1c;
+      font-size: 14px;
+    }
+    .btn-bayar {
+      margin-top: 15px;
+      padding: 12px;
+      font-size: 16px;
+      background-color: #d84315;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .btn-bayar:hover {
+      background-color: #bf360c;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background: white;
+      margin: 6% auto;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .close {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #999;
+    }
+    .close:hover { color: #333; }
+    .tab-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
+    .tab-buttons button { flex: 1; background: #607d8b; color: white; padding: 10px; border: none; border-radius: 6px; }
+    .tab-buttons button.active { background: #b71c1c; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .bank-box {
+      background: #f7f7f7;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🚨 Daftar Tunggakan</h2>
+    <input type="text" id="rumah" placeholder="Masukkan Nomor Rumah (contoh: K20)" />
+    <button onclick="cekTunggakan()">Cek Tunggakan</button>
+    <div id="hasil"></div>
+  </div>
+
+  <!-- MODAL PEMBAYARAN -->
+  <div id="payModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closePayModal()">✕</span>
+      <h3 style="text-align:center;color:#b71c1c;margin-bottom:10px;">💳 Metode Pembayaran</h3>
+      <div class="tab-buttons">
+        <button id="btnTabQRIS" class="active" onclick="switchTab('qris')">QRIS</button>
+        <button id="btnTabTF" onclick="switchTab('transfer')">Transfer</button>
+      </div>
+      <div id="tabQRIS" class="tab-panel active">
+        <p>Scan QRIS berikut, lalu simpan bukti pembayaran.</p>
+        <img src="https://i.postimg.cc/nzbyh4JJ/Gambar-Whats-App-2025-07-17-pukul-16-45-11-33bebf07.jpg" alt="QRIS" style="width:100%;border-radius:8px;">
+      </div>
+      <div id="tabTransfer" class="tab-panel">
+        <p>Transfer ke rekening berikut:</p>
+        <div class="bank-box">
+          <strong>Bank:</strong> BCA<br>
+          <strong>No. Rek:</strong> 1234567890<br>
+          <strong>Atas Nama:</strong> Paguyuban Citra Amarta
+        </div>
+      </div>
+      <button class="btn-bayar" onclick="openWhatsApp()">Konfirmasi via WhatsApp</button>
+    </div>
+  </div>
+
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby4tD1WUW37hirYG73Su357D2zMVkje2eGgFJtj3EsaLC-IKWxQsmdUCLo0DpD5pdsWVg/exec";
+    const WA_NUMBER = "6281258214836";
+    let totalGlobal = 0;
+    let namaPemilik = "";
+    let tunggakanData = [];
+
+    function convertDriveUrlToDirectImage(url) {
+      const match = url.match(/\/file\/d\/([^/]+)\//);
+      return match ? `https://lh3.googleusercontent.com/d/${match[1]}=s800` : '';
+    }
+
+    function cekTunggakan() {
+      const rumah = document.getElementById("rumah").value.trim().toUpperCase();
+      const hasil = document.getElementById("hasil");
+      if (!rumah) {
+        hasil.innerHTML = "<p style='color:red;'>❗ Silakan masukkan nomor rumah.</p>";
+        return;
+      }
+
+      hasil.innerHTML = "🔄 Mengambil data...";
+      fetch(`${GAS_URL}?action=search_all&rumah=${encodeURIComponent(rumah)}&t=${Date.now()}`)
+        .then(res => res.json())
+        .then(json => {
+          if (!json.success || !json.data || json.data.length === 0) {
+            hasil.innerHTML = "<p style='color:green;'>✅ Tidak ada tunggakan.</p>";
+            return;
+          }
+
+          tunggakanData = json.data;
+          totalGlobal = 0;
+          namaPemilik = json.data[0].nama || "Tidak diketahui";
+
+          let html = `<p><strong>Nama Pemilik:</strong> ${namaPemilik}</p>`;
+          html += `<table>
+                    <thead>
+                      <tr>
+                        <th>Bulan</th><th>Tahun</th><th>IPL</th><th>Air</th><th>Sampah</th><th>Total</th><th>Foto</th>
+                      </tr>
+                    </thead><tbody>`;
+
+          json.data.forEach(item => {
+            const ipl = parseInt(item.ipl.replace(/[^\d]/g, '')) || 0;
+            const air = parseInt(item.air.replace(/[^\d]/g, '')) || 0;
+            const sampah = parseInt(item.sampah.replace(/[^\d]/g, '')) || 0;
+            const total = ipl + air + sampah;
+            totalGlobal += total;
+
+            const foto = item.foto ? `<img src="${convertDriveUrlToDirectImage(item.foto)}" alt="Foto">` : '-';
+
+            html += `<tr>
+                      <td>${item.bulan}</td><td>${item.tahun}</td>
+                      <td>${item.ipl}</td><td>${item.air}</td><td>${item.sampah}</td>
+                      <td><strong>Rp ${total.toLocaleString('id-ID')}</strong></td>
+                      <td>${foto}</td>
+                    </tr>`;
+          });
+
+          html += `</tbody></table>`;
+          html += `<div class="total-warning">⚠️ Total Seluruh Tunggakan: Rp ${totalGlobal.toLocaleString('id-ID')}</div>`;
+          html += `<div class="note">📌 <strong>Note:</strong> Jika menunggak 3 bulan, maka akan dilakukan pemadaman air sementara.</div>`;
+          html += `<button class="btn-bayar" onclick="openPayModal()">💳 Bayar Semua Sekarang</button>`;
+          hasil.innerHTML = html;
+        })
+        .catch(err => {
+          console.error(err);
+          hasil.innerHTML = "<p style='color:red;'>❌ Gagal mengambil data.</p>";
+        });
+    }
+
+    function openPayModal() {
+      document.getElementById('payModal').style.display = 'block';
+      switchTab('qris');
+    }
+
+    function closePayModal() {
+      document.getElementById('payModal').style.display = 'none';
+    }
+
+    function switchTab(tab) {
+      document.getElementById('btnTabQRIS').classList.toggle('active', tab === 'qris');
+      document.getElementById('btnTabTF').classList.toggle('active', tab === 'transfer');
+      document.getElementById('tabQRIS').classList.toggle('active', tab === 'qris');
+      document.getElementById('tabTransfer').classList.toggle('active', tab === 'transfer');
+    }
+
+    function openWhatsApp() {
+      const pesan =
+`Halo Admin, saya ingin konfirmasi pembayaran seluruh tunggakan.
+
+Nama: ${namaPemilik}
+Total Tagihan: Rp ${totalGlobal.toLocaleString('id-ID')}
+
+Sudah saya bayar. Mohon dicek ya. Terima kasih.`;
+      window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(pesan)}`, '_blank');
+    }
+
+    window.onclick = function(e) {
+      const modal = document.getElementById('payModal');
+      if (e.target === modal) modal.style.display = 'none';
+    };
+  </script>
+</body>
+</html>

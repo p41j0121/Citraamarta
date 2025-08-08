@@ -2,77 +2,142 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Pemasukan Bulanan</title>
+  <title>DATA PEMASUKAN CA</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background-color: #f5f5f5;
-      text-align: center;
       padding: 40px 20px;
     }
     h1 {
       color: #00796b;
-      margin-bottom: 10px;
+      text-align: center;
     }
-    p {
-      color: #555;
+    table {
+      width: 100%;
+      max-width: 1000px;
+      margin: 30px auto;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    .bulan-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 30px;
+    th, td {
+      padding: 16px 12px;
+      border: 1px solid #ddd;
+      vertical-align: middle;
     }
-    .bulan-container a {
-      text-decoration: none;
+    th {
       background-color: #009688;
       color: white;
-      padding: 12px 20px;
-      margin: 10px;
-      border-radius: 10px;
-      transition: background 0.2s;
-      font-weight: bold;
+      font-size: 15px;
+      text-align: center;
     }
-    .bulan-container a:hover {
-      background-color: #004d40;
+    td {
+      font-size: 16px;
+      white-space: nowrap;
     }
+
+    /* Kolom teks rata kiri */
+    td.keterangan {
+      text-align: left;
+    }
+
+    /* Kolom angka rata kanan */
+    td.angka {
+      text-align: right;
+    }
+
     .back {
-      display: inline-block;
-      margin-top: 40px;
+      display: block;
+      width: fit-content;
+      margin: 40px auto 0;
       padding: 10px 18px;
       background-color: #ccc;
       color: #333;
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
+      text-align: center;
     }
     .back:hover {
       background-color: #999;
+    }
+
+    .loading {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h1>📥 Pemasukan Bulanan</h1>
-  <p>Silakan pilih bulan untuk melihat data pemasukan:</p>
+  <h1>📥 <span style="color: teal;">DATA PEMASUKAN CA</span></h1>
 
-  <div class="bulan-container">
-    <a href="detail.html?hal=pemasukan&bulan=Januari">Januari</a>
-    <a href="detail.html?hal=pemasukan&bulan=Februari">Februari</a>
-    <a href="detail.html?hal=pemasukan&bulan=Maret">Maret</a>
-    <a href="detail.html?hal=pemasukan&bulan=April">April</a>
-    <a href="detail.html?hal=pemasukan&bulan=Mei">Mei</a>
-    <a href="detail.html?hal=pemasukan&bulan=Juni">Juni</a>
-    <a href="detail.html?hal=pemasukan&bulan=Juli">Juli</a>
-    <a href="detail.html?hal=pemasukan&bulan=Agustus">Agustus</a>
-    <a href="detail.html?hal=pemasukan&bulan=September">September</a>
-    <a href="detail.html?hal=pemasukan&bulan=Oktober">Oktober</a>
-    <a href="detail.html?hal=pemasukan&bulan=November">November</a>
-    <a href="detail.html?hal=pemasukan&bulan=Desember">Desember</a>
-  </div>
+  <div class="loading" id="loading">Loading Dulu Boss...</div>
+
+  <table id="pemasukanTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>SISA SALDO UPDATE</th>
+        <th>PEMASUKAN</th>
+        <th>KETERANGAN</th>
+        <th>PENGELUARAN</th>
+        <th>KETERANGAN</th>
+        <th>SISA SALDO</th>
+        <th>DANA LEBIH</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
   <a href="data.html" class="back">← Kembali ke Data</a>
+
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbycybM9KCMPT-TBkwsgt9EPL2R2rAeDk5xr3eKzMj1dbbeKAbFRJb-BP58AiSwoOwby/exec?action=pemasukan";
+
+    function formatRupiah(angka) {
+      if (!angka || angka === "-") return "-";
+      let strAngka = angka.toString().replace(/[^\d]/g, "");
+      let number = parseInt(strAngka);
+      if (isNaN(number)) return angka;
+      return "Rp " + number.toLocaleString("id-ID");
+    }
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(json => {
+        const table = document.getElementById("pemasukanTable");
+        const tbody = table.querySelector("tbody");
+        const loading = document.getElementById("loading");
+
+        if (json.success && json.data.length > 0) {
+          json.data.forEach(item => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td class="angka">${formatRupiah(item.SISA_SALDO_UPDATE)}</td>
+              <td class="angka">${formatRupiah(item.PEMASUKAN)}</td>
+              <td class="keterangan">${item.KETERANGAN_1 || '-'}</td>
+              <td class="angka">${formatRupiah(item.PENGELUARAN)}</td>
+              <td class="keterangan">${item.KETERANGAN_2 || '-'}</td>
+              <td class="angka">${formatRupiah(item.SISA_SALDO)}</td>
+              <td class="angka">${formatRupiah(item.DANA_LEBIH)}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+          table.style.display = "table";
+          loading.style.display = "none";
+        } else {
+          loading.innerText = "Data pemasukan tidak tersedia.";
+        }
+      })
+      .catch(err => {
+        document.getElementById("loading").innerText = "Gagal memuat data.";
+        console.error(err);
+      });
+  </script>
 
 </body>
 </html>

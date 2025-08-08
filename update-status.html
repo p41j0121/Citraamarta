@@ -18,6 +18,12 @@
     .lunas{background:#2e7d32}.belum{background:#c62828}
     .hidden{display:none}
   </style>
+  <script>
+    if (localStorage.getItem("isAdminLoggedIn") !== "true") {
+      alert("❌ Akses ditolak.Hayoo Mau ngapain?Jangan Aneh-Aneh deh :D");
+      window.location.href = "data.html";
+    }
+  </script>
 </head>
 <body>
   <div class="container">
@@ -127,10 +133,9 @@
           if (json.success) {
             updateStatusMsg.style.color = "green";
             updateStatusMsg.innerText = "✅ Status berhasil diperbarui!";
-            // Refresh data dari sheet supaya tampilan sinkron.
             setTimeout(() => cari(), 500);
           } else {
-          throw new Error(json.message || "Unknown error");
+            throw new Error(json.message || "Unknown error");
           }
         })
         .catch(err => {

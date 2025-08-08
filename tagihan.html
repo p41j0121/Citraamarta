@@ -6,41 +6,99 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Nunito', sans-serif; background: #f5f5f5; padding: 20px; }
-    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    h2 { text-align: center; color: #00796b; }
-    label { margin-top: 10px; display: block; font-weight: bold; }
-    input, select, button { width: 100%; padding: 10px; margin-top: 5px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
-    button { background-color: #00796b; color: white; font-weight: bold; cursor: pointer; margin-top: 15px; }
-    button:hover { background-color: #004d40; }
-    #hasil { margin-top: 20px; padding: 15px; background: #e0f2f1; border-radius: 8px; }
-    .pay-btn { background:#2e7d32; }
-    .pay-btn:hover { background:#1b5e20; }
-
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #00796b;
+    }
+    label {
+      margin-top: 10px;
+      display: block;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .cek-tagihan-btn {
+      background-color: #00796b;
+      color: white;
+    }
+    .cek-tunggakan-btn {
+      background-color: #c62828;
+      color: white;
+    }
+    .pay-btn {
+      background: #2e7d32;
+      color: white;
+      margin-top: 10px;
+    }
     .modal {
-      display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.4);
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
     }
     .modal-content {
-      background:#fff; margin:6% auto; padding:20px; border-radius:12px; max-width:500px; position:relative;
-      box-shadow:0 8px 24px rgba(0,0,0,0.2);
+      background: #fff;
+      margin: 4% auto;
+      padding: 20px;
+      padding-bottom: 80px;
+      border-radius: 12px;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
     .close {
-      position:absolute; right:15px; top:10px; font-size:22px; cursor:pointer; color:#999;
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #999;
     }
-    .close:hover { color:#333; }
-    .tab-buttons{ display:flex; gap:8px; margin-bottom:10px; }
-    .tab-buttons button{ flex:1; background:#607d8b; }
-    .tab-buttons button.active{ background:#004d40; }
-    .tab-panel{ display:none; }
-    .tab-panel.active{ display:block; }
-    .bank-box{
-      background:#f7f7f7; padding:12px; border-radius:8px; margin-top:8px; font-size:15px;
+    .tab-buttons button.active {
+      background: #004d40;
     }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
     img.foto-meteran {
-      max-width: 100%;
+      max-width: 200px;
       border-radius: 8px;
       margin-top: 10px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
     }
   </style>
 </head>
@@ -49,7 +107,6 @@
     <h2>🔍 Cek Tagihan</h2>
     <label>Nomor Rumah</label>
     <input type="text" id="rumah" placeholder="cth: K20">
-
     <label>Bulan</label>
     <select id="bulan">
       <option value="">Pilih Bulan</option>
@@ -58,17 +115,15 @@
       <option>Juli</option><option>Agustus</option><option>September</option>
       <option>Oktober</option><option>November</option><option>Desember</option>
     </select>
-
     <label>Tahun</label>
     <select id="tahun">
       <option value="">Pilih Tahun</option>
       <option>2025</option><option>2026</option><option>2027</option>
-      <option>2028</option><option>2029</option><option>2030</option>
-      <option>2039</option><option>2040</option><option>2041</option>
-      <option>2042</option><option>2043</option><option>2045</option>
     </select>
-
-    <button onclick="cekTagihan()">Cek Tagihan</button>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+      <button class="cek-tagihan-btn" style="flex:1;" onclick="cekTagihan()">Cek Tagihan</button>
+      <button class="cek-tunggakan-btn" style="flex:1;" onclick="window.location.href='tunggakan.html'">Cek Tunggakan</button>
+    </div>
     <div id="hasil"></div>
   </div>
 
@@ -81,80 +136,74 @@
         <button id="btnTabQRIS" class="active" onclick="switchTab('qris')">QRIS</button>
         <button id="btnTabTF" onclick="switchTab('transfer')">Transfer</button>
       </div>
-
       <div id="tabQRIS" class="tab-panel active">
         <p>Scan QRIS berikut, lalu simpan bukti pembayaran.</p>
-        <img src="qris.png" alt="QRIS" style="width:100%;border-radius:8px;">
+        <img src="https://i.postimg.cc/nzbyh4JJ/Gambar-Whats-App-2025-07-17-pukul-16-45-11-33bebf07.jpg"
+             alt="QRIS"
+             style="max-width:100%;width:200px;height:auto;border-radius:8px;margin:auto;display:block;">
       </div>
-
       <div id="tabTransfer" class="tab-panel">
         <p>Transfer ke rekening berikut:</p>
-        <div class="bank-box">
+        <div style="background:#f7f7f7;padding:12px;border-radius:8px;">
           <strong>Bank:</strong> BCA<br>
           <strong>No. Rek:</strong> 1234567890<br>
           <strong>Atas Nama:</strong> Paguyuban Citra Amarta
         </div>
       </div>
-
-      <button style="margin-top:15px;" onclick="openWhatsApp()">Konfirmasi via WhatsApp</button>
+      <hr>
+      <label for="jumlahBayar">💰 Jumlah yang Dibayarkan</label>
+      <input type="number" id="jumlahBayar" placeholder="Masukkan jumlah (contoh: 150000)">
+      <label for="buktiFoto">📸 Upload Bukti Transfer</label>
+      <input type="file" id="buktiFoto" accept="image/*" onchange="uploadFotoBukti(this)">
+      <p id="uploadStatus" style="font-style:italic;color:green;"></p>
+      <button onclick="openWhatsApp()">✅ Konfirmasi via WhatsApp</button>
     </div>
   </div>
 
   <script>
-    const GAS_URL   = "https://script.google.com/macros/s/AKfycbzefjRQlgLpqvffNvSJQVcaUF9e1-Aads8ChYqHZ1OnAYZMoz2PdibCmwQG7pAhim7z/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby4tD1WUW37hirYG73Su357D2zMVkje2eGgFJtj3EsaLC-IKWxQsmdUCLo0DpD5pdsWVg/exec";
+    const UPLOAD_URL = "https://script.google.com/macros/s/AKfycbxLLNdH-W6qLwy7R5ktx_HFF1iS5pupJo7ZcUkZ9aaBcp-H_DosM2ZY5Mu9tFlZL6pb/exec";
     const WA_NUMBER = "6281258214836";
     let lastTagihan = null;
+    let uploadedFotoURL = "";
+
+    function formatRupiah(angka) {
+      return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    }
 
     function cekTagihan() {
       const rumah = document.getElementById("rumah").value.trim().toUpperCase();
       const bulan = document.getElementById("bulan").value.trim();
       const tahun = document.getElementById("tahun").value.trim();
       const hasil = document.getElementById("hasil");
-
       if (!rumah || !bulan || !tahun) {
         hasil.innerHTML = "<span style='color:red;'>❗ Masukkan nomor rumah, bulan, dan tahun.</span>";
         return;
       }
-
       hasil.innerHTML = "🔄 Mengambil data...";
-      const url = `${GAS_URL}?action=search&rumah=${encodeURIComponent(rumah)}&bulan=${encodeURIComponent(bulan)}&tahun=${encodeURIComponent(tahun)}&t=${Date.now()}`;
-
-      fetch(url, { cache: "no-store" })
+      fetch(`${GAS_URL}?action=search&rumah=${rumah}&bulan=${bulan}&tahun=${tahun}&t=${Date.now()}`)
         .then(res => res.json())
         .then(json => {
           if (!json.success) {
             hasil.innerHTML = "❌ Tagihan tidak ditemukan.";
-            lastTagihan = null;
             return;
           }
-
           const t = json.data;
           lastTagihan = t;
-
-          const statusColor = (t.status || '').toLowerCase() === 'lunas' ? 'green' : 'red';
-          const bayarBtn = (t.status || '').toLowerCase() === 'belum lunas'
-            ? `<button class="pay-btn" onclick="openPayModal()">💳 Bayar Sekarang</button>`
-            : '';
-
+          const total = [t.ipl, t.air, t.sampah].map(x => parseInt(x.replace(/[^\d]/g,''))||0).reduce((a,b)=>a+b);
+          const fotoURL = t.foto ? `https://lh3.googleusercontent.com/d/${t.foto.match(/[-\w]{25,}/)}` : '';
           hasil.innerHTML = `
             <strong>Nama:</strong> ${t.nama}<br>
-            <strong>Nomor Rumah:</strong> ${t.rumah}<br>
-            <strong>Bulan:</strong> ${t.bulan}<br>
-            <strong>Tahun:</strong> ${t.tahun}<br>
+            <strong>Rumah:</strong> ${t.rumah}<br>
+            <strong>Periode:</strong> ${t.bulan} ${t.tahun}<br>
             <strong>IPL:</strong> ${t.ipl}<br>
             <strong>Air:</strong> ${t.air}<br>
             <strong>Sampah:</strong> ${t.sampah}<br>
-            <strong>Status:</strong> <span style="color:${statusColor};font-weight:bold">${t.status || '-'}</span><br><br>
-            ${t.foto
-              ? `<img class="foto-meteran" src="${t.foto}" alt="Foto Meteran">`
-              : `<p style="color:gray;font-style:italic;">Belum ada foto meteran yang diunggah.</p>`}
-            ${bayarBtn}
+            <strong>Total:</strong> <b>${formatRupiah(total)}</b><br>
+            <strong>Status:</strong> <span style="color:${t.status === 'Lunas' ? 'green' : 'red'}">${t.status}</span><br><br>
+            ${fotoURL ? `<img class="foto-meteran" src="${fotoURL}" alt="Foto Meteran">` : '<em style="color:gray;">Tidak ada foto meteran.</em>'}
+            ${t.status === 'Belum Lunas' ? `<button class="pay-btn" onclick="openPayModal()">💳 Bayar Sekarang</button>` : ''}
           `;
-        })
-        .catch(err => {
-          console.error(err);
-          hasil.innerHTML = "❌ Gagal mengambil data.";
-          lastTagihan = null;
         });
     }
 
@@ -162,47 +211,61 @@
       document.getElementById('payModal').style.display = 'block';
       switchTab('qris');
     }
+
     function closePayModal() {
       document.getElementById('payModal').style.display = 'none';
     }
-    window.onclick = function(e) {
-      const modal = document.getElementById('payModal');
-      if (e.target === modal) modal.style.display = 'none';
-    }
 
     function switchTab(tab) {
-      const btnQR  = document.getElementById('btnTabQRIS');
-      const btnTF  = document.getElementById('btnTabTF');
-      const tabQR  = document.getElementById('tabQRIS');
-      const tabTF  = document.getElementById('tabTransfer');
-
-      if (tab === 'qris') {
-        btnQR.classList.add('active'); btnTF.classList.remove('active');
-        tabQR.classList.add('active'); tabTF.classList.remove('active');
-      } else {
-        btnTF.classList.add('active'); btnQR.classList.remove('active');
-        tabTF.classList.add('active'); tabQR.classList.remove('active');
-      }
+      document.getElementById('btnTabQRIS').classList.toggle('active', tab === 'qris');
+      document.getElementById('btnTabTF').classList.toggle('active', tab === 'transfer');
+      document.getElementById('tabQRIS').classList.toggle('active', tab === 'qris');
+      document.getElementById('tabTransfer').classList.toggle('active', tab === 'transfer');
     }
+
+function uploadFotoBukti(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const base64 = e.target.result.split(",")[1]; // Ambil data base64 saja
+
+    document.getElementById("uploadStatus").textContent = "📤 Mengupload...";
+
+    const form = new FormData();
+    form.append("foto", base64); // sesuai yang Apps Script harapkan
+
+    fetch(UPLOAD_URL, {
+      method: "POST",
+      body: form
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success && data.url) {
+        uploadedFotoURL = data.url;
+        document.getElementById("uploadStatus").textContent = "✅ Bukti berhasil diupload.";
+      } else {
+        document.getElementById("uploadStatus").textContent = "❌ Gagal upload.";
+        console.error("UPLOAD FAILED:", data);
+      }
+    })
+    .catch(err => {
+      document.getElementById("uploadStatus").textContent = "❌ Gagal upload.";
+      console.error("UPLOAD ERROR:", err);
+    });
+  };
+
+  reader.readAsDataURL(file); // convert to base64
+}
+
 
     function openWhatsApp() {
       if (!lastTagihan) return;
-      const t = lastTagihan;
-      const pesan = 
-`Halo Admin, saya ingin konfirmasi pembayaran tagihan.
-
-Nama: ${t.nama}
-Rumah: ${t.rumah}
-Periode: ${t.bulan} ${t.tahun}
-IPL: ${t.ipl}
-Air: ${t.air}
-Sampah: ${t.sampah}
-Status saat ini di sistem: ${t.status}
-
-Sudah saya bayar. Mohon dicek ya. Terima kasih.`;
-
-      const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(pesan)}`;
-      window.open(url, '_blank');
+      const jumlahBayar = document.getElementById("jumlahBayar").value || '-';
+      const fotoLink = uploadedFotoURL ? `\n📎 Bukti Transfer: ${uploadedFotoURL}` : '';
+      const pesan = `Halo Admin, saya ingin konfirmasi pembayaran tagihan.\n\nNama: ${lastTagihan.nama}\nRumah: ${lastTagihan.rumah}\nPeriode: ${lastTagihan.bulan} ${lastTagihan.tahun}\nJumlah dibayar: ${formatRupiah(jumlahBayar)}${fotoLink}\n\nMohon dicek ya. Terima kasih.`;
+      window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(pesan)}`, '_blank');
     }
   </script>
 </body>

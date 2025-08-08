@@ -107,6 +107,7 @@
       font-weight: bold;
       border-radius: 8px;
       border: none;
+      position: relative;
     }
     .login-button {
       background-color: #00796b;
@@ -116,9 +117,24 @@
       background-color: #ccc;
     }
     .modal-content p {
-      color: red;
       text-align: center;
       margin-top: 10px;
+    }
+    /* Spinner di tombol */
+    .spinner {
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top: 2px solid white;
+      border-radius: 50%;
+      width: 14px;
+      height: 14px;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
@@ -149,7 +165,7 @@
       <input type="text" id="username" placeholder="Username">
       <input type="password" id="password" placeholder="Password">
       <div style="display:flex; justify-content: space-between; margin-top:10px;">
-        <button class="login-button" onclick="login()">Login</button>
+        <button class="login-button" id="loginBtn" onclick="login()">Login</button>
         <button class="cancel-button" onclick="document.getElementById('loginModal').style.display='none'">Batal</button>
       </div>
       <p id="loginStatus"></p>
@@ -168,11 +184,19 @@
       const user = document.getElementById('username').value.trim();
       const pass = document.getElementById('password').value.trim();
       const status = document.getElementById('loginStatus');
+      const loginBtn = document.getElementById('loginBtn');
 
       if (!user || !pass) {
+        status.style.color = "red";
         status.innerText = "❌ Username dan Password wajib diisi!";
         return;
       }
+
+      // Tambah spinner
+      loginBtn.innerHTML = '<span class="spinner"></span>Loading...';
+      loginBtn.disabled = true;
+      status.style.color = "black";
+      status.innerText = "";
 
       fetch(GAS_URL, {
         method: "POST",
@@ -184,11 +208,17 @@
           localStorage.setItem("isAdminLoggedIn", "true");
           window.location.href = "admin.html";
         } else {
+          status.style.color = "red";
           status.innerText = "❌ " + data.message;
         }
       })
       .catch(err => {
+        status.style.color = "red";
         status.innerText = "❌ Terjadi kesalahan koneksi!";
+      })
+      .finally(() => {
+        loginBtn.innerHTML = 'Login';
+        loginBtn.disabled = false;
       });
     }
 

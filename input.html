@@ -107,8 +107,8 @@
   </div>
 
   <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzefjRQlgLpqvffNvSJQVcaUF9e1-Aads8ChYqHZ1OnAYZMoz2PdibCmwQG7pAhim7z/exec';
-    const imgbbKey = '40ee2c5d0fe71b0afdb293f91a003b2b';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycby4tD1WUW37hirYG73Su357D2zMVkje2eGgFJtj3EsaLC-IKWxQsmdUCLo0DpD5pdsWVg/exec';
+    const DRIVE_UPLOAD_URL = 'https://script.google.com/macros/s/AKfycbx_6MtProqvqqVWMSIdJS_UMfOtxh_s4S75EiAV9FvlQ16VOaTR6d835BmUkbyWqXEJ/exec';
 
     document.getElementById("formTagihan").addEventListener("submit", async function(e) {
       e.preventDefault();
@@ -120,56 +120,80 @@
 
       const fileInput = document.getElementById("foto");
       const file = fileInput.files[0];
-      const formDataImg = new FormData();
-      formDataImg.append("image", file);
-
-      let fotoURL = "";
-      try {
-        const resImg = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbKey}`, {
-          method: "POST",
-          body: formDataImg
-        });
-        const jsonImg = await resImg.json();
-        fotoURL = jsonImg.data.url;
-      } catch (err) {
+      if (!file) {
         statusEl.style.color = 'red';
-        statusEl.innerText = "❌ Gagal upload foto";
+        statusEl.innerText = "❌ Silakan pilih foto meteran terlebih dahulu.";
         btn.disabled = false;
         return;
       }
 
-      statusEl.innerText = "⏳ Mengirim data ke spreadsheet...";
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = reader.result.split(',')[1];
 
-      const formData = new FormData();
-      formData.append("rumah", document.getElementById("rumah").value.trim().toUpperCase());
-      formData.append("nama", document.getElementById("nama").value.trim());
-      formData.append("bulan", document.getElementById("bulan").value.trim());
-      formData.append("tahun", document.getElementById("tahun").value.trim());
-      formData.append("ipl", "Rp " + document.getElementById("ipl").value);
-      formData.append("sampah", "Rp " + document.getElementById("sampah").value);
-      formData.append("air", "Rp " + document.getElementById("air").value);
-      formData.append("status", "Belum Lunas");
-      formData.append("foto", fotoURL);
+        const formUpload = new FormData();
+        formUpload.append("file", base64);
+        formUpload.append("filename", file.name);
 
-      try {
-        const res = await fetch(GAS_URL, {
-          method: 'POST',
-          body: formData
-        });
-        const json = await res.json();
-        if (json.success) {
-          statusEl.style.color = 'green';
-          statusEl.innerText = "✅ Data berhasil dikirim!";
-          document.getElementById("formTagihan").reset();
-        } else {
-          throw new Error(json.message || "Gagal menyimpan data");
+        let fotoURL = "";
+        try {
+          const resDrive = await fetch(DRIVE_UPLOAD_URL, {
+            method: "POST",
+            body: formUpload
+          });
+          const jsonDrive = await resDrive.json();
+          console.log("📸 Respon dari Drive:", jsonDrive);
+          if (jsonDrive.success) {
+            fotoURL = jsonDrive.url;
+            console.log("✅ URL Foto yang akan dikirim ke Spreadsheet:", fotoURL);
+            statusEl.innerText = "⏳ Mengirim data ke spreadsheet...";
+          } else {
+            throw new Error(jsonDrive.message || "Gagal upload ke Drive");
+          }
+        } catch (err) {
+          statusEl.style.color = 'red';
+          statusEl.innerText = "❌ Gagal upload foto: " + err.message;
+          btn.disabled = false;
+          return;
         }
-      } catch (err) {
-        statusEl.style.color = 'red';
-        statusEl.innerText = "❌ Gagal: " + err.message;
-      } finally {
-        btn.disabled = false;
-      }
+
+        const formData = new FormData();
+        formData.append("rumah", document.getElementById("rumah").value.trim().toUpperCase());
+        formData.append("nama", document.getElementById("nama").value.trim());
+        formData.append("bulan", document.getElementById("bulan").value.trim());
+        formData.append("tahun", document.getElementById("tahun").value.trim());
+        formData.append("ipl", "Rp " + document.getElementById("ipl").value);
+        formData.append("sampah", "Rp " + document.getElementById("sampah").value);
+        formData.append("air", "Rp " + document.getElementById("air").value);
+        formData.append("status", "Belum Lunas");
+        formData.append("foto", fotoURL);
+
+        console.log("📤 Form data akan dikirim:");
+        for (let [key, val] of formData.entries()) {
+          console.log(key, val);
+        }
+
+        try {
+          const res = await fetch(GAS_URL, {
+            method: 'POST',
+            body: formData
+          });
+          const json = await res.json();
+          if (json.success) {
+            statusEl.style.color = 'green';
+            statusEl.innerText = "✅ Data berhasil dikirim!";
+            document.getElementById("formTagihan").reset();
+          } else {
+            throw new Error(json.message || "Gagal menyimpan data");
+          }
+        } catch (err) {
+          statusEl.style.color = 'red';
+          statusEl.innerText = "❌ Gagal: " + err.message;
+        } finally {
+          btn.disabled = false;
+        }
+      };
+      reader.readAsDataURL(file);
     });
   </script>
 </body>

@@ -102,17 +102,17 @@
     .close-btn:hover { color: black; }
   </style>
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbznYSCom57dZZYtshdg3Cs5aecy4J2a9GetW6BnyfDHS4qBRfpWp6jZLc6ancTowPSpyA/exec";
-
-    // Proteksi akses halaman admin
+    // Proteksi akses halaman admin, cek login dulu
     if (localStorage.getItem("isAdminLoggedIn") !== "true") {
-      alert("❌ Akses ditolak. Silakan login terlebih dahulu.");
-      window.location.href = "data.html";
+      alert("Hayooo Kamu mau ngapain?? Login dulu dong!");
+      window.location.href = "index.html"; // lempar ke halaman utama
     }
+
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbznYSCom57dZZYtshdg3Cs5aecy4J2a9GetW6BnyfDHS4qBRfpWp6jZLc6ancTowPSpyA/exec";
 
     function logout() {
       localStorage.removeItem("isAdminLoggedIn");
-      window.location.href = "data.html";
+      window.location.href = "index.html";
     }
 
     function registerUser() {
@@ -127,7 +127,6 @@
         return;
       }
 
-      // Loading effect
       btn.disabled = true;
       btn.innerHTML = "⏳ Loading...";
       status.style.color = "black";

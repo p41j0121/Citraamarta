@@ -41,6 +41,10 @@
     button:hover {
       background-color: #8e0000;
     }
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -49,6 +53,7 @@
     th, td {
       padding: 10px;
       border: 1px solid #e57373;
+      text-align: center;
     }
     th {
       background-color: #ffcdd2;
@@ -113,7 +118,6 @@
       cursor: pointer;
       color: #999;
     }
-    .close:hover { color: #333; }
     .tab-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
     .tab-buttons button { flex: 1; background: #607d8b; color: white; padding: 10px; border: none; border-radius: 6px; }
     .tab-buttons button.active { background: #b71c1c; }
@@ -157,16 +161,23 @@
           <strong>Atas Nama:</strong> Paguyuban Citra Amarta
         </div>
       </div>
+      <hr>
+      <label for="jumlahBayar">💰 Jumlah yang Dibayarkan</label>
+      <input type="number" id="jumlahBayar" placeholder="Masukkan jumlah (contoh: 150000)">
+      <label for="buktiFoto">📸 Upload Bukti Transfer</label>
+      <input type="file" id="buktiFoto" accept="image/*" onchange="uploadFotoBukti(this)">
+      <p id="uploadStatus" style="font-style:italic;color:green;"></p>
       <button class="btn-bayar" onclick="openWhatsApp()">Konfirmasi via WhatsApp</button>
     </div>
   </div>
 
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycby4tD1WUW37hirYG73Su357D2zMVkje2eGgFJtj3EsaLC-IKWxQsmdUCLo0DpD5pdsWVg/exec";
+    const UPLOAD_URL = "https://script.google.com/macros/s/AKfycbxLLNdH-W6qLwy7R5ktx_HFF1iS5pupJo7ZcUkZ9aaBcp-H_DosM2ZY5Mu9tFlZL6pb/exec";
     const WA_NUMBER = "6281258214836";
-    let totalGlobal = 0;
     let namaPemilik = "";
-    let tunggakanData = [];
+    let uploadedFotoURL = "";
+    let selectedTunggakan = [];
 
     function convertDriveUrlToDirectImage(url) {
       const match = url.match(/\/file\/d\/([^/]+)\//);
@@ -190,14 +201,12 @@
             return;
           }
 
-          tunggakanData = json.data;
-          totalGlobal = 0;
           namaPemilik = json.data[0].nama || "Tidak diketahui";
-
           let html = `<p><strong>Nama Pemilik:</strong> ${namaPemilik}</p>`;
           html += `<table>
                     <thead>
                       <tr>
+                        <th>Pilih</th>
                         <th>Bulan</th><th>Tahun</th><th>IPL</th><th>Air</th><th>Sampah</th><th>Total</th><th>Foto</th>
                       </tr>
                     </thead><tbody>`;
@@ -207,11 +216,9 @@
             const air = parseInt(item.air.replace(/[^\d]/g, '')) || 0;
             const sampah = parseInt(item.sampah.replace(/[^\d]/g, '')) || 0;
             const total = ipl + air + sampah;
-            totalGlobal += total;
-
             const foto = item.foto ? `<img src="${convertDriveUrlToDirectImage(item.foto)}" alt="Foto">` : '-';
-
             html += `<tr>
+                      <td><input type="checkbox" class="pilih-bayar" data-bulan="${item.bulan}" data-tahun="${item.tahun}" data-total="${total}"></td>
                       <td>${item.bulan}</td><td>${item.tahun}</td>
                       <td>${item.ipl}</td><td>${item.air}</td><td>${item.sampah}</td>
                       <td><strong>Rp ${total.toLocaleString('id-ID')}</strong></td>
@@ -219,16 +226,35 @@
                     </tr>`;
           });
 
-          html += `</tbody></table>`;
-          html += `<div class="total-warning">⚠️ Total Seluruh Tunggakan: Rp ${totalGlobal.toLocaleString('id-ID')}</div>`;
-          html += `<div class="note">📌 <strong>Note:</strong> Jika menunggak 3 bulan, maka akan dilakukan pemadaman air sementara.</div>`;
-          html += `<button class="btn-bayar" onclick="openPayModal()">💳 Bayar Semua Sekarang</button>`;
+          html += `</tbody></table>
+                   <div class="total-warning" id="totalPilihan">Total Dipilih: Rp 0</div>
+                   <div class="note">📌 <strong>Note:</strong> Pilih bulan yang ingin dibayar, lalu klik Bayar.</div>
+                   <button class="btn-bayar" id="btnBayar" disabled onclick="openPayModal()">💳 Bayar Sekarang</button>`;
           hasil.innerHTML = html;
+
+          document.querySelectorAll(".pilih-bayar").forEach(cb => {
+            cb.addEventListener("change", updateTotal);
+          });
         })
         .catch(err => {
           console.error(err);
           hasil.innerHTML = "<p style='color:red;'>❌ Gagal mengambil data.</p>";
         });
+    }
+
+    function updateTotal() {
+      selectedTunggakan = [];
+      let total = 0;
+      document.querySelectorAll(".pilih-bayar:checked").forEach(cb => {
+        selectedTunggakan.push({
+          bulan: cb.dataset.bulan,
+          tahun: cb.dataset.tahun,
+          total: parseInt(cb.dataset.total)
+        });
+        total += parseInt(cb.dataset.total);
+      });
+      document.getElementById("totalPilihan").textContent = `Total Dipilih: Rp ${total.toLocaleString('id-ID')}`;
+      document.getElementById("btnBayar").disabled = selectedTunggakan.length === 0;
     }
 
     function openPayModal() {
@@ -247,14 +273,56 @@
       document.getElementById('tabTransfer').classList.toggle('active', tab === 'transfer');
     }
 
+    function uploadFotoBukti(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const base64 = e.target.result.split(",")[1]; 
+        document.getElementById("uploadStatus").textContent = "📤 Mengupload...";
+        const form = new FormData();
+        form.append("foto", base64);
+        fetch(UPLOAD_URL, { method: "POST", body: form })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.url) {
+              uploadedFotoURL = data.url;
+              document.getElementById("uploadStatus").textContent = "✅ Bukti berhasil diupload.";
+            } else {
+              document.getElementById("uploadStatus").textContent = "❌ Gagal upload.";
+            }
+          })
+          .catch(err => {
+            document.getElementById("uploadStatus").textContent = "❌ Gagal upload.";
+          });
+      };
+      reader.readAsDataURL(file);
+    }
+
     function openWhatsApp() {
+      const jumlahBayar = document.getElementById("jumlahBayar").value.trim();
+      if (!jumlahBayar || parseInt(jumlahBayar) <= 0) {
+        alert("❗ Harap masukkan jumlah yang dibayarkan.");
+        document.getElementById("jumlahBayar").focus();
+        return;
+      }
+      if (!uploadedFotoURL) {
+        alert("❗ Harap upload bukti transfer terlebih dahulu.");
+        document.getElementById("buktiFoto").focus();
+        return;
+      }
+      const total = selectedTunggakan.reduce((a, b) => a + b.total, 0);
+      const bulanList = selectedTunggakan.map(i => `${i.bulan} ${i.tahun}`).join(", ");
+      const fotoLink = `\n📎 Bukti Transfer: ${uploadedFotoURL}`;
       const pesan =
-`Halo Admin, saya ingin konfirmasi pembayaran seluruh tunggakan.
+`Halo Admin, saya ingin konfirmasi pembayaran tunggakan.
 
 Nama: ${namaPemilik}
-Total Tagihan: Rp ${totalGlobal.toLocaleString('id-ID')}
+Bulan dibayar: ${bulanList}
+Total tagihan: Rp ${total.toLocaleString('id-ID')}
+Jumlah dibayar: Rp ${parseInt(jumlahBayar).toLocaleString('id-ID')}${fotoLink}
 
-Sudah saya bayar. Mohon dicek ya. Terima kasih.`;
+Mohon dicek ya. Terima kasih.`;
       window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(pesan)}`, '_blank');
     }
 

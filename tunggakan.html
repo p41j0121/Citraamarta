@@ -174,7 +174,7 @@
   <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycby4tD1WUW37hirYG73Su357D2zMVkje2eGgFJtj3EsaLC-IKWxQsmdUCLo0DpD5pdsWVg/exec";
     const UPLOAD_URL = "https://script.google.com/macros/s/AKfycbxLLNdH-W6qLwy7R5ktx_HFF1iS5pupJo7ZcUkZ9aaBcp-H_DosM2ZY5Mu9tFlZL6pb/exec";
-    const WA_NUMBER = "6283830611232";
+    const WA_NUMBER = "6283830611232"; // ✅ Nomor WA baru
     let namaPemilik = "";
     let uploadedFotoURL = "";
     let selectedTunggakan = [];
@@ -301,17 +301,26 @@
 
     function openWhatsApp() {
       const jumlahBayar = document.getElementById("jumlahBayar").value.trim();
+      const total = selectedTunggakan.reduce((a, b) => a + b.total, 0);
+
       if (!jumlahBayar || parseInt(jumlahBayar) <= 0) {
         alert("❗ Harap masukkan jumlah yang dibayarkan.");
         document.getElementById("jumlahBayar").focus();
         return;
       }
+
+      if (parseInt(jumlahBayar) !== total) {
+        alert(`❗ Jumlah yang dibayarkan harus sesuai dengan total tagihan: Rp ${total.toLocaleString('id-ID')}`);
+        document.getElementById("jumlahBayar").focus();
+        return;
+      }
+
       if (!uploadedFotoURL) {
         alert("❗ Harap upload bukti transfer terlebih dahulu.");
         document.getElementById("buktiFoto").focus();
         return;
       }
-      const total = selectedTunggakan.reduce((a, b) => a + b.total, 0);
+
       const bulanList = selectedTunggakan.map(i => `${i.bulan} ${i.tahun}`).join(", ");
       const fotoLink = `\n📎 Bukti Transfer: ${uploadedFotoURL}`;
       const pesan =
@@ -323,6 +332,7 @@ Total tagihan: Rp ${total.toLocaleString('id-ID')}
 Jumlah dibayar: Rp ${parseInt(jumlahBayar).toLocaleString('id-ID')}${fotoLink}
 
 Mohon dicek ya. Terima kasih.`;
+
       window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(pesan)}`, '_blank');
     }
 
@@ -333,4 +343,3 @@ Mohon dicek ya. Terima kasih.`;
   </script>
 </body>
 </html>
-

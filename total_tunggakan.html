@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Daftar Tunggakan Warga - Tema Seram Friendly</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #faf8f5;
+      color: #5b0000;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #8b0000;
+      user-select: none;
+      margin-bottom: 10px;
+    }
+    #searchBox {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 2px solid #8b0000;
+      border-radius: 6px;
+      background: #fff;
+      color: #5b0000;
+      font-size: 1.1em;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+    #searchBox:focus {
+      border-color: #b22222;
+      box-shadow: 0 0 8px #f7cfcf;
+      background: #fff0f0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff0f0;
+      border: 2px solid #8b0000;
+      box-shadow: 0 0 10px #e8b4b4;
+    }
+    th, td {
+      border: 1px solid #b22222;
+      padding: 10px 12px;
+      text-align: left;
+      user-select: none;
+    }
+    th {
+      background: #b22222;
+      color: #fff0f0;
+      font-weight: bold;
+    }
+    td {
+      font-weight: bold;
+    }
+    tbody tr:nth-child(odd) {
+      background: #fff5f5;
+    }
+    tbody tr:nth-child(even) {
+      background: #ffeaea;
+    }
+    tbody tr.highlight {
+      background: rgba(178, 34, 34, 0.3) !important;
+      color: #5b0000 !important;
+      font-weight: bold;
+    }
+    .total-box {
+      background: #ffeaea;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.3em;
+      text-align: center;
+      color: #8b0000;
+      user-select: none;
+    }
+    .note-box {
+      background: #fff0f0;
+      border: 2px solid #b22222;
+      color: #8b0000;
+      font-weight: normal; /* Diubah jadi normal */
+      padding: 12px 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .note-box > div {
+      font-weight: normal; /* Pesan juga normal */
+    }
+    .btn-bayar {
+      background-color: #b22222;
+      color: #fff0f0;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .btn-bayar:hover {
+      background-color: #8b0000;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Daftar Tunggakan Warga</h1>
+
+<div class="note-box">
+  <div>Note: Ayo, Bayar tagihan sesuai tanggal yang ditentukan.</div>
+  <a href="tagihan.html" class="btn-bayar">Bayar</a>
+</div>
+
+<input type="text" id="searchBox" placeholder="Cari Nomor Rumah atau Nama..." />
+<div class="total-box" id="totalKeseluruhan">Total Tunggakan: Rp 0</div>
+
+<table id="tunggakanTable">
+  <thead>
+    <tr>
+      <th>No Rumah</th>
+      <th>Nama Warga</th>
+      <th>Bulan Tunggakan</th>
+      <th>Total (Rp)</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<!-- PapaParse CDN -->
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<script>
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAVVD5q1nuEx9LeIgme5ZqfAwUyXHoRikQDiaseAIQXvxTDObitnX1boBEQa2DpP0NXWorJ7rVh3UC/pub?gid=0&single=true&output=csv";
+
+let dataTunggakan = [];
+
+fetch(SHEET_CSV_URL)
+  .then(res => res.text())
+  .then(csvText => {
+    const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+    const data = parsed.data;
+
+    const tunggakanMap = {};
+    let totalKeseluruhan = 0;
+
+    data.forEach(row => {
+      const rumah = (row["RUMAH"] || "").trim();
+      const nama = (row["NAMA"] || "").trim();
+      const bulan = (row["BULAN"] || "").trim();
+
+      const iplStr = (row["IPL"] || "0").trim();
+      const sampahStr = (row["SAMPAH"] || "0").trim();
+      const airStr = (row["AIR"] || "0").trim();
+
+      const ipl = parseInt(iplStr.replace(/\D/g, '')) || 0;
+      const sampah = parseInt(sampahStr.replace(/\D/g, '')) || 0;
+      const air = parseInt(airStr.replace(/\D/g, '')) || 0;
+
+      const jumlah = ipl + sampah + air;
+
+      const status = (row["STATUS"] || "").trim();
+
+      if (status === "Belum Lunas") {
+        if (!tunggakanMap[rumah]) {
+          tunggakanMap[rumah] = { nama, bulan: [], total: 0 };
+        }
+        tunggakanMap[rumah].bulan.push(bulan);
+        tunggakanMap[rumah].total += jumlah;
+        totalKeseluruhan += jumlah;
+      }
+    });
+
+    dataTunggakan = Object.keys(tunggakanMap).map(rumah => ({
+      rumah,
+      nama: tunggakanMap[rumah].nama,
+      bulan: tunggakanMap[rumah].bulan.join(", "),
+      total: tunggakanMap[rumah].total
+    }));
+
+    renderTable(dataTunggakan);
+    updateTotal(dataTunggakan);
+  })
+  .catch(err => {
+    console.error("Gagal ambil data:", err);
+  });
+
+function renderTable(data) {
+  const tbody = document.querySelector("#tunggakanTable tbody");
+  tbody.innerHTML = "";
+
+  data.forEach(item => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${item.rumah}</td>
+      <td>${item.nama}</td>
+      <td>${item.bulan}</td>
+      <td>${item.total.toLocaleString("id-ID")}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateTotal(data) {
+  const total = data.reduce((sum, item) => sum + item.total, 0);
+  document.getElementById("totalKeseluruhan").innerText =
+    "Total Tunggakan: Rp " + total.toLocaleString("id-ID");
+}
+
+document.getElementById("searchBox").addEventListener("input", function () {
+  const keyword = this.value.toLowerCase();
+
+  const filtered = dataTunggakan.filter(item => {
+    return item.rumah.toLowerCase().includes(keyword) || item.nama.toLowerCase().includes(keyword);
+  });
+
+  renderTable(filtered);
+  updateTotal(filtered);
+
+  // Highlight baris yang cocok
+  setTimeout(() => {
+    document.querySelectorAll("#tunggakanTable tbody tr").forEach(tr => {
+      const tdRumah = tr.children[0].innerText.toLowerCase();
+      const tdNama = tr.children[1].innerText.toLowerCase();
+      if (tdRumah.includes(keyword) || tdNama.includes(keyword)) {
+        tr.classList.add("highlight");
+      } else {
+        tr.classList.remove("highlight");
+      }
+    });
+  }, 0);
+});
+</script>
+
+</body>
+</html>
